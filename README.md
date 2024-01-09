@@ -54,3 +54,17 @@ If you jar files are in different locations adjust the `-classpath` line as appr
 Here we have configured CodeNarc to use the rules in `rulesets/healthomics.xml` which is defined in this library and
 contained in this libraries JAR file. The `-includes` parameter takes an Ant style pattern. This pattern will inspect
 all `*.nf` files at the current location and in subdirectories.
+
+## Development
+
+### Add a rule
+TODO
+
+### Add a Test
+TODO
+
+### Update the Ruleset
+TODO
+
+## Docker
+TODO
