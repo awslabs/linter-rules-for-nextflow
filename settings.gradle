@@ -12,5 +12,5 @@ plugins {
 
 rootProject.name = 'nextflow-healthomics-codenarc-rules'
 include('healthomics-nextflow-rules')
-include 'ast-echo'
+include('ast-echo')
 

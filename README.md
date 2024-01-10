@@ -58,7 +58,20 @@ all `*.nf` files at the current location and in subdirectories.
 ## Development
 
 ### Add a rule
-TODO
+
+CodeNarc rules are typically implemented using the [visitor pattern](https://en.wikipedia.org/wiki/Visitor_pattern. Rules
+that follow this pattern will extend the `org.codenarc.rule.AbstractAstVisitorRule` and declare a "companion" visitor
+class that extends the `org.codenarc.rule.AbstractAstVisitor`.  The `AbstractAstVisitor` defines several methods beginning
+with `visit` such as `visitMethodCallExpression(MethodCallExpression expression)`. The visitor class associated with the
+rule will need to override the visit method (or methods) that are relevant to the code they wish to examine.
+
+There is one visit method for each of the possible Groovy language expressions and statements. Unfortunately there are
+dozens of Groovy expressions and statements which can make it difficult to know which your rule needs to override. It is
+also not immediately obvious how Nextflow statements and expressions are semantically realized as Groovy. To help you decide,
+this package includes a Java application (AstEchoCli) that will echo the Groovy Abstract Syntax Tree for any Nextflow script or other valid
+Groovy or Groovy DSL. Consult the README.md in the `ast-echo` folder of this project for build and usage instructions.
+
+TODO - information about expected rule structure
 
 ### Add a Test
 TODO
