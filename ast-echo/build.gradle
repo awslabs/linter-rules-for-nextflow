@@ -1,4 +1,5 @@
 plugins {
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'java'
     id 'application'
 }
@@ -6,13 +7,9 @@ plugins {
 group = 'software.amazon.groovy'
 version = '0.1'
 
-
-
 application {
-    mainClass = 'softare.amazon.groovy.AstEchoCli'
+    mainClass = 'software.amazon.groovy.AstEchoCli'
 }
-
-
 
 repositories {
     mavenCentral()
@@ -33,4 +30,10 @@ test {
 
 compileJava {
     options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+}
+
+jar {
+    manifest {
+        attributes "Main-Class": application.mainClass
+    }
 }
