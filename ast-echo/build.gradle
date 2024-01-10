@@ -1,0 +1,36 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'software.amazon.groovy'
+version = '0.1'
+
+
+
+application {
+    mainClass = 'softare.amazon.groovy.AstEchoCli'
+}
+
+
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'info.picocli:picocli:4.7.5'
+    implementation 'org.codehaus.groovy:groovy-all:3.0.18'  // to get access to the GroovyAST and support
+    annotationProcessor 'info.picocli:picocli-codegen:4.7.5'
+
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+compileJava {
+    options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+}
