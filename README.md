@@ -41,7 +41,7 @@ Assuming your have built this library (see "Build" above) you can run the follow
 
 ```shell
 java  -Dorg.slf4j.simpleLogger.defaultLogLevel=error \
-  -classpath ./lib/build/libs/lib.jar:CodeNarc-3.3.0-all.jar:slf4j-api-1.7.36.jar:slf4j-simple-1.7.36.jar \
+  -classpath ./healthomics-nextflow-rules/build/libs/healthomics-nextflow-0.1.jar:CodeNarc-3.3.0-all.jar:slf4j-api-1.7.36.jar:slf4j-simple-1.7.36.jar \
   org.codenarc.CodeNarc \
   -report=text:stdout \
   -rulesetfiles=rulesets/healthomics.xml \
