@@ -110,13 +110,119 @@ also not immediately obvious how Nextflow statements and expressions are semanti
 this package includes a Java application (AstEchoCli) that will echo the Groovy Abstract Syntax Tree for any Nextflow script or other valid
 Groovy or Groovy DSL. Consult the README.md in the `ast-echo` folder of this project for build and usage instructions.
 
-TODO - information about expected rule structure
+New rules should be added to the appropriate package in `/healthomics-nextflow-rules/src/groovy`.
+
+A rule consists of a Rule and an ASTVisitor typically in the same groovy file. The Rule `class` should extend `AbstractAstVisitorRule`
+
+```groovy
+class MyRule extends AbstractAstVisitorRule {
+
+    String name = 'MyRule'
+    int priority = 3
+    Class astVisitorClass = MyRuleAstVisitor
+}
+```
+
+```groovy
+class MyRuleAstVisitor extends AbstractAstVisitor {
+    // override visitor methods as needed
+    // for example:
+
+    @Override
+    void visitMethodCallExpression(MethodCallExpression expression){
+        // code here to inspect the expression to determine if it is relevant to the check and if it violates the check
+        
+        // ...
+        
+        // for any violations, add them
+        if(somethingBad){
+            addViolation(expression, "message explaining violation and potential fix")
+        }
+        
+        // importantly, call the super method to continue traversal of the AST
+        super.visitMethodCallExpression(expression)
+    }
+}
+```
 
 ### Add a Test
-TODO
+
+All rules should include tests for cases that produce no violations and cases that should produce violations. Tests
+should extend `AbstractRuleTestCase<T>` where `T` is the class of your new rule.
+
+For example:
+```groovy
+class CpuRuleTest extends AbstractRuleTestCase<CpuRule> {
+
+    // provides an instance of the rule to the test
+    @Override
+    protected CpuRule createRule() {
+        new CpuRule()
+    }
+
+    // test the properties of the rule are what you think they should be
+    @Test
+    void ruleProperties() {
+        assert rule.priority == 2
+        assert rule.name == "CpuRule"
+    }
+
+    // provide one or more tests that produce no violations for valid code (and edge cases)
+    @Test
+    void cpuRule_NoViolationsMin() {
+        final SOURCE =
+                '''
+                process MY_PROCESS {
+                 cpus 2
+                }
+                '''
+        assertNoViolations(SOURCE)
+    }
+
+    // provide at least one test that contains source that will trigger one or more violations
+    @Test
+    void cpuRule_TooManyArgsViolation() {
+        final SOURCE =
+                '''
+                process MY_PROCESS {
+                    cpus 14, 18
+                }
+                '''
+        // assertion that only one violation occurs and that it matches the expected priority, violating code fragment
+        // and violation message.
+        // several other assert violation methods are available for various scenarios
+        assertSingleViolation(SOURCE, 3, "cpus 14, 18",
+                "the cpus directive must have only one argument")
+    }
+}
+```
+
+### Running tests
+
+To run all tests in this project you should use:
+
+```shell
+./gradlew test
+```
+
+To run all tests in a specific Rule test class (in this case CpuRuleTest):
+
+```shell
+./gradlew test --tests CpuRuleTest
+```
+
+To run a specific test method in a test class:
+
+```shell
+./gradlew test --tests CpuRuleTest.cpuRule_TooManyArgsViolation
+```
 
 ### Update the Ruleset
-TODO
 
-## Docker
-TODO
+When a rule is created it should be added to the `resources/rulesets/healthomics.xml` file. Entries use the fully 
+qualified class name of the rule. Assuming the new Rule is called `NewRule` and the package is 
+`software.amazon.nextflow.rules.healthomics`, the rule to be added will be:
+
+```xml
+<rule class="software.amazon.nextflow.rules.healthomics.NewRule"/>
+```
