@@ -7,11 +7,13 @@ This means that we can create custom CodeNarc rules that inspect Nextflow script
 potential issues. 
 
 ## Build
-To build this library into a JAR file you can use
+To build this library you can use
 
 ```shell
-./gradlew jar
+./gradlew clean jar shadowJar
 ```
+
+The resulting jar files will be found in `healthomics-nextflow-rules/build/libs/` and `ast-echo/build/libs`
 
 ## Run
  To run lint checks against Nextflow files you need to have access to the CodeNarc jar as well as an SLF4J implementation
