@@ -40,7 +40,7 @@ class PublishDirAstVisitor extends AbstractAstVisitor{
     }
 
     private void checkPublishDirConstant(ConstantExpression expression){
-        if ( !(expression.getText() =~ "/mnt/workflow/pubdir/?")){
+        if ( !(expression.getText() =~ "/mnt/workflow/pubdir(/.*)?")){
             addViolation(expression,
                     "AWS HealthOmics requires the value of publishDir to be '/mnt/workflow/pubdir'. " +
                             "Please replace the current value")

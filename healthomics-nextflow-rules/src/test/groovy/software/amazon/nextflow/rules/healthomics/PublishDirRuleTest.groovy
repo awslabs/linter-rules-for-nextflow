@@ -62,6 +62,17 @@ process foo {
     }
 
     @Test
+    void publishDirRule_NoViolationsTrailingDirs(){
+        final String SOURCE =
+                '''
+process foo {
+    publishDir '/mnt/workflow/pubdir/dir1/dir2/'
+}
+'''
+        assertNoViolations(SOURCE)
+    }
+
+    @Test
     void publishDirRule_NoViolationsParameterized(){
         final String SOURCE =
 '''
