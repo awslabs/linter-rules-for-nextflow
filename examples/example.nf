@@ -1,4 +1,7 @@
 process foo {
+    container 'ubuntu:latest'
+    cpu 1
+
     output:
     path 'foo.txt'
 
@@ -9,6 +12,10 @@ process foo {
 }
 
 process bar {
+    container 'ubuntu:latest'
+    cpu 1
+    publishDir '/foo'
+
     input:
     path x
 

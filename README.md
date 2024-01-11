@@ -43,7 +43,7 @@ Assuming your have built this library (see "Build" above) you can run the follow
 
 ```shell
 java  -Dorg.slf4j.simpleLogger.defaultLogLevel=error \
-  -classpath ./healthomics-nextflow-rules/build/libs/healthomics-nextflow-0.1.jar:CodeNarc-3.3.0-all.jar:slf4j-api-1.7.36.jar:slf4j-simple-1.7.36.jar \
+  -classpath ./healthomics-nextflow-rules/build/libs/healthomics-nextflow-rules-0.1.jar:CodeNarc-3.3.0-all.jar:slf4j-api-1.7.36.jar:slf4j-simple-1.7.36.jar \
   org.codenarc.CodeNarc \
   -report=text:stdout \
   -rulesetfiles=rulesets/healthomics.xml \
@@ -56,6 +56,43 @@ If you jar files are in different locations adjust the `-classpath` line as appr
 Here we have configured CodeNarc to use the rules in `rulesets/healthomics.xml` which is defined in this library and
 contained in this libraries JAR file. The `-includes` parameter takes an Ant style pattern. This pattern will inspect
 all `*.nf` files at the current location and in subdirectories.
+
+### Docker
+
+A `Dockerfile` is provided for this project which will build an image that contains the scripts in `scripts/` and the
+required JAR files. To build the container:
+
+`docker build -t hox-nf-rules .`
+
+The container is configured to (by default) run the HealthOmics Nextflow rules against all Nextflow (`*.nf`) files found 
+in the `data` volume. For example, to check the files in the `examples/` folder:
+
+```shell
+cd examples
+docker run -v $PWD:/data hox-nf-rules
+```
+
+which will produce a report similar to:
+
+```
+CodeNarc Report - Jan 11, 2024, 8:29:21?PM
+
+Summary: TotalFiles=1 FilesWithViolations=1 P1=3 P2=0 P3=0
+
+File: example.nf
+    Violation: Rule=ContainerUriIsEcrUri P=1 Line=2 Msg=[The container image URI 'ubuntu:latest' does not match the pattern '\d{12}\.dkr\.ecr\..+\.amazonaws.com/.*'. Replace with an ECR image URI.] Src=[container 'ubuntu:latest']
+    Violation: Rule=ContainerUriIsEcrUri P=1 Line=15 Msg=[The container image URI 'ubuntu:latest' does not match the pattern '\d{12}\.dkr\.ecr\..+\.amazonaws.com/.*'. Replace with an ECR image URI.] Src=[container 'ubuntu:latest']
+    Violation: Rule=PublishDirRule P=1 Line=17 Msg=[AWS HealthOmics requires the value of publishDir to be '/mnt/workflow/pubdir'. Please replace the current value] Src=[publishDir '/foo']
+
+[CodeNarc (https://codenarc.org) v3.3.0]
+CodeNarc completed: (p1=3; p2=0; p3=0) 1757ms
+```
+
+The container also contains the `ast-echo` application along with a script to run it (`echo-tree.sh`). For example:
+
+```shell
+docker run -v $PWD/examples:/data hox-nf-rules ./echo-tree.sh /data/example.nf
+```
 
 ## Development
 
