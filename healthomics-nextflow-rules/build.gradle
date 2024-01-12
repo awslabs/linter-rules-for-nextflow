@@ -4,6 +4,9 @@ plugins {
 
     // Apply the java-library plugin for API and implementation separation.
     id 'java-library'
+
+    // Apply the intellij idea plugin, used below to download source and javadocs for dependencies (see idea { ... })
+    id 'idea'
 }
 
 group = 'software.amazon.healthomics'
@@ -29,6 +32,13 @@ dependencies {
 
     // This dependency is exported to consumers, that is to say found on their compile classpath.
     // api 'org.apache.commons:commons-math3:3.6.1'
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
