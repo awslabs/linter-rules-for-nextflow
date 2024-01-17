@@ -48,9 +48,44 @@ class MissingProcessDirectivesRuleTest extends AbstractRuleTestCase<MissingProce
     }
 
     @Test
+    void twoProcesses_CpusMissing(){
+        final String SOURCE =
+'''process PROCESS_A {
+        memory '2 GB'
+        container 'foo:baa'
+    }
+    process PROCESS_B {
+        memory '2 GB'
+        container 'foo:baa'
+    }
+'''
+        assertViolations(SOURCE,
+                [line:1, source: 'process PROCESS_A {', message:'PROCESS_A does not contain a cpus directive which is recommended for reproducibility'],
+                [line:5, source: 'process PROCESS_B {', message:'PROCESS_B does not contain a cpus directive which is recommended for reproducibility']
+        )
+    }
+
+    @Test
     void hasAllDirectives_NoViolations(){
         final SOURCE =
 '''process MY_PROCESS {
+        memory '2 GB'
+        cpus 2
+        container 'foo:baa'
+    }
+'''
+        assertNoViolations(SOURCE)
+    }
+
+    @Test
+    void hasAllDirectivesTwoProcesses_NoViolations(){
+        final SOURCE =
+'''process PROCESS_A {
+        memory '2 GB'
+        cpus 2
+        container 'foo:baa'
+    }
+    process PROCESS_B {
         memory '2 GB'
         cpus 2
         container 'foo:baa'
