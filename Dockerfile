@@ -1,4 +1,4 @@
-FROM public.ecr.aws/amazonlinux/amazonlinux:2023.3.20240108.0
+FROM public.ecr.aws/amazonlinux/amazonlinux:2023
 
 RUN dnf install java wget /usr/bin/xargs -y
 

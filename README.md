@@ -62,7 +62,9 @@ all `*.nf` files at the current location and in subdirectories.
 A `Dockerfile` is provided for this project which will build an image that contains the scripts in `scripts/` and the
 required JAR files. To build the container:
 
-`docker build -t hox-nf-rules .`
+```shell
+docker build -t hox-nf-rules .
+```
 
 The container is configured to (by default) run the HealthOmics Nextflow rules against all Nextflow (`*.nf`) files found 
 in the `data` volume. For example, to check the files in the `examples/` folder:
