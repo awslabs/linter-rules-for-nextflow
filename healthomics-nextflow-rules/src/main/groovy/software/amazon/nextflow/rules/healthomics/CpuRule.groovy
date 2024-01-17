@@ -8,7 +8,6 @@ import org.codenarc.rule.AbstractAstVisitor
 import org.codenarc.rule.AbstractAstVisitorRule
 import org.codenarc.util.AstUtil
 
-// todo add tests
 class CpuRule extends AbstractAstVisitorRule {
     String name = 'CpuRule'
     int priority = 2
@@ -27,6 +26,7 @@ class CpuAstVisitor extends AbstractAstVisitor {
 
         super.visitMethodCallExpression(expression)
     }
+
 
     private checkOneArgument(final MethodCallExpression expression){
         def methodArguments = AstUtil.getMethodArguments(expression)
