@@ -1,3 +1,5 @@
+nextflow.enable.dsl=2
+
 process foo {
     container 'ubuntu:latest'
     cpus 1
