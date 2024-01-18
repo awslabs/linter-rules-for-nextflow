@@ -26,12 +26,12 @@ class CpuMemoryRatioAstVisitor extends AbstractAstVisitor {
     void visitMethodCallExpression(MethodCallExpression call) {
         String methodName = call.getMethodAsString()
         if (methodName == 'process') {
-            nestedProcessMethodDepth++
+            nestedProcessMethodDepth = 1
         } else if (nestedProcessMethodDepth > 0){
             nestedProcessMethodDepth++
 
-            // at depth >= 2 method calls might be process directives
-            if (nestedProcessMethodDepth >= 2) {
+            // at depth 3 method calls are process directives
+            if (nestedProcessMethodDepth == 3) {
                 switch (methodName) {
                     case 'cpus':
                         requestedCpu = handleCpu(call)

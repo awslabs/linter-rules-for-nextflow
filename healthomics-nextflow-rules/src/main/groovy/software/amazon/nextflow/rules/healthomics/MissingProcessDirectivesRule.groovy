@@ -28,12 +28,12 @@ class MissingProcessDirectivesVisitor extends AbstractAstVisitor {
     void visitMethodCallExpression(MethodCallExpression node) {
         String methodName = node.getMethodAsString()
         if (methodName == 'process') {
-            nestedProcessMethodDepth++
+            nestedProcessMethodDepth = 1
         } else if (nestedProcessMethodDepth > 0){
             nestedProcessMethodDepth++
 
-            // at depth >= 2 method calls might be process directives
-            if (nestedProcessMethodDepth >= 2) {
+            // at depth 3 method calls might be process directives
+            if (nestedProcessMethodDepth == 3) {
                 switch (methodName) {
                     case 'cpus':
                         declaresCpus = true
