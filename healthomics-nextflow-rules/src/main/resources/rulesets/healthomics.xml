@@ -4,7 +4,16 @@
     <description>
         Rules that detect Nextflow constructs that are likely to cause problems when run in AWS HealthOmics workflows.
     </description>
+
+    <!-- Nextflow rules -->
+    <rule class="software.amazon.nextflow.rules.AllowedDirectivesRule"/>
+
+    <!-- Nextflow on HealthOmics rules -->
     <rule class="software.amazon.nextflow.rules.healthomics.ContainerUriRule"/>
+    <rule class="software.amazon.nextflow.rules.healthomics.CpuMemoryRatioRule"/>
     <rule class="software.amazon.nextflow.rules.healthomics.CpuRule"/>
+    <rule class="software.amazon.nextflow.rules.healthomics.MemoryRule"/>
+    <rule class="software.amazon.nextflow.rules.healthomics.MissingProcessDirectivesRule"/>
     <rule class="software.amazon.nextflow.rules.healthomics.PublishDirRule"/>
+    
 </ruleset>
