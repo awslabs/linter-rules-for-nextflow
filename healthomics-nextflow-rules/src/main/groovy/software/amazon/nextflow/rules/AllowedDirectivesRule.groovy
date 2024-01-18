@@ -26,7 +26,11 @@ class AllowedDirectivesAstVisitor extends AbstractAstVisitor {
             nestedProcessMethodDepth++
 
             // at depth 3 method calls are process directives
-            if (nestedProcessMethodDepth == 3 && !(methodName in NFUtils.ALLOWED_NF_PROCESS_DIRECTIVES)) {
+            if (nestedProcessMethodDepth == 3 &&
+                    !(methodName in NFUtils.ALLOWED_NF_INPUTS_DIRECTIVES) &&  // these are allowed method calls
+                    !(methodName in NFUtils.ALLOWED_NF_OUTPUTS_DIRECTIVES) && // also allowed method calls
+                    !(methodName in NFUtils.ALLOWED_NF_PROCESS_DIRECTIVES)    // process directives (method calls)
+            ) {
                 addViolation(node, "The process directive $methodName is not recognized. " +
                         "Check the value and correct if needed")
             }
