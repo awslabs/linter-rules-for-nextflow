@@ -345,6 +345,7 @@ process retryIfFail {
     """
 }
 '''
+        assertNoViolations(SOURCE)
     }
 
     @Test
@@ -585,5 +586,6 @@ process big_job {
     """
 }
 '''
+        assertNoViolations(SOURCE)
     }
 }
