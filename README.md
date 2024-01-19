@@ -125,7 +125,7 @@ A rule consists of a Rule and an ASTVisitor typically in the same groovy file. T
 class MyRule extends AbstractAstVisitorRule {
 
     String name = 'MyRule'
-    int priority = 3
+    int priority = 3        // priority indicates severity of the violation. 1 = severe, 2 = moderate, 3 = advisory
     Class astVisitorClass = MyRuleAstVisitor
 }
 ```
@@ -139,14 +139,12 @@ class MyRuleAstVisitor extends AbstractAstVisitor {
     void visitMethodCallExpression(MethodCallExpression expression){
         // code here to inspect the expression to determine if it is relevant to the check and if it violates the check
         
-        // ...
-        
         // for any violations, add them
         if(somethingBad){
             addViolation(expression, "message explaining violation and potential fix")
         }
         
-        // importantly, call the super method to continue traversal of the AST
+        // importantly, call the super method to continue traversal of the AST before you exit the method
         super.visitMethodCallExpression(expression)
     }
 }
