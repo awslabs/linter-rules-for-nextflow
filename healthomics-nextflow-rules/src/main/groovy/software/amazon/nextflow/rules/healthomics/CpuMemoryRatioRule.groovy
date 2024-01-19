@@ -13,9 +13,9 @@ class CpuMemoryRatioRule extends AbstractAstVisitorRule{
 }
 
 class CpuMemoryRatioAstVisitor extends AbstractAstVisitor {
-    def C_RATIO = 2
-    def M_RATIO = 4
-    def R_RATIO = 8
+    float C_RATIO = 2.0
+    float M_RATIO = 4.0
+    float R_RATIO = 8.0
 
     def okRatios = [C_RATIO, M_RATIO, R_RATIO]
     def requestedCpu = 0
@@ -92,17 +92,9 @@ class CpuMemoryRatioAstVisitor extends AbstractAstVisitor {
     }
 
     private checkMemoryToCpuRatio(MethodCallExpression call){
-
         def memToCpuRatio = (requestedMemory / requestedCpu) as float
-        def ok = false
-        for (ratio in okRatios) {
-           if (memToCpuRatio == ratio as float) {
-               ok == true
-               break
-           }
-        }
 
-        if (!ok) {
+        if (! okRatios.contains(memToCpuRatio)) {
             addViolation(call, "Memory to cpu ratio may not be optimal for HealthOmics " +
                     "instance placement. Ratios of 2:1, 4:1 or 8:1 are optimal")
         }
