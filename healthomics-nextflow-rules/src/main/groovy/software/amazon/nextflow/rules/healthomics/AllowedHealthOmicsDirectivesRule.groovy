@@ -3,7 +3,8 @@ package software.amazon.nextflow.rules.healthomics
 import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codenarc.rule.AbstractAstVisitor
 import org.codenarc.rule.AbstractAstVisitorRule
-import software.amazon.nextflow.rules.NFUtils
+import software.amazon.nextflow.rules.utils.HealthOmicsNFUtils
+import software.amazon.nextflow.rules.utils.NFUtils
 
 class AllowedHealthOmicsDirectivesRule extends AbstractAstVisitorRule{
     String name = 'AllowedHealthOmicsDirectivesRule'

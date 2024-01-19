@@ -3,6 +3,7 @@ package software.amazon.nextflow.rules
 import org.codehaus.groovy.ast.expr.MethodCallExpression
 import org.codenarc.rule.AbstractAstVisitor
 import org.codenarc.rule.AbstractAstVisitorRule
+import software.amazon.nextflow.rules.utils.NFUtils
 
 /**
  * Checks if a process directive is one of the recognized Nextflow Directives

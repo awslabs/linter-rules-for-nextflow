@@ -1,4 +1,4 @@
-package software.amazon.nextflow.rules.healthomics
+package software.amazon.nextflow.rules.utils
 
 class HealthOmicsNFUtils {
     def static UNSUPPORTED_NF_PROCESS_DIRECTIVES = [

@@ -1,4 +1,4 @@
-package software.amazon.nextflow.rules
+package software.amazon.nextflow.rules.utils
 
 class NFUtils {
     def static ALLOWED_NF_PROCESS_DIRECTIVES = [
