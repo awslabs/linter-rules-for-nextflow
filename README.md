@@ -1,4 +1,7 @@
-# HealthOmics CodeNarc Rules for Nextflow Scripts
+# HealthOmics Rules for Nextflow Scripts
+
+The HealthOmics Rules for Nextlfow Scripts is a collection of CodeNarc rules designed to lint Nextflow DSL scripts and
+spot potential problems before a workflow script is run.
 
 Because Nextflow DSL2 is a Groovy DSL it is possible to parse it syntactically with a Groovy parser and inspect it's
 Abstract Syntax Tree using a Groovy static analysis tool (linter) like [CodeNarc](https://codenarc.org/).
