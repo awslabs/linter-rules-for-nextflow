@@ -1,3 +1,7 @@
+<!--
+    Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+    SPDX-License-Identifier: Apache-2.0
+-->
 <ruleset xmlns="http://codenarc.org/ruleset/1.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://codenarc.org/ruleset/1.0 http://codenarc.org/ruleset-schema.xsd">
@@ -14,6 +18,7 @@
     <rule class="software.amazon.nextflow.rules.healthomics.CpuMemoryRatioRule"/>
     <rule class="software.amazon.nextflow.rules.healthomics.CpuRule"/>
     <rule class="software.amazon.nextflow.rules.healthomics.DslVersionRule"/>
+    <rule class="software.amazon.nextflow.rules.healthomics.GpuRule"/>
     <rule class="software.amazon.nextflow.rules.healthomics.MemoryRule"/>
     <rule class="software.amazon.nextflow.rules.healthomics.MissingProcessDirectivesRule"/>
     <rule class="software.amazon.nextflow.rules.healthomics.PublishDirRule"/>

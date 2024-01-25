@@ -1,3 +1,8 @@
+/*
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package software.amazon.nextflow.rules.healthomics
 
 import org.codehaus.groovy.ast.expr.ConstantExpression
@@ -8,8 +13,6 @@ import org.codehaus.groovy.ast.expr.PropertyExpression
 import org.codenarc.rule.AbstractAstVisitor
 import org.codenarc.rule.AbstractAstVisitorRule
 import org.codenarc.util.AstUtil
-
-import java.beans.Expression
 
 class GpuRule extends AbstractAstVisitorRule {
     String name = 'GpuRule'

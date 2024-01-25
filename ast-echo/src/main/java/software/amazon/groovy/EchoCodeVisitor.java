@@ -1,3 +1,8 @@
+/*
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package software.amazon.groovy;
 
 import java.util.Collections;
@@ -240,10 +245,8 @@ public class EchoCodeVisitor extends CodeVisitorSupport {
 
     @Override
     public void visitTupleExpression(TupleExpression expression) {
-//        this.depth++;
-//        echoExpression(expression);
-          super.visitTupleExpression(expression);
-//        this.depth--;
+        // Depth is not incremented and these expressions are not echoed as they are always another expression type like BinaryExpression
+        super.visitTupleExpression(expression);
     }
 
     @Override

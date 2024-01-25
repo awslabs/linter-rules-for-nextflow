@@ -1,5 +1,9 @@
-package software.amazon.nextflow.rules.healthomics
+/*
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ */
 
+package software.amazon.nextflow.rules.healthomics
 
 import org.codehaus.groovy.ast.expr.ConstantExpression
 import org.codehaus.groovy.ast.expr.MethodCallExpression

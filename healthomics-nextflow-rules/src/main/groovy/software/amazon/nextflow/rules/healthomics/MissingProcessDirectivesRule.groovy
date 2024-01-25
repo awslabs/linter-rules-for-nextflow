@@ -1,3 +1,8 @@
+/*
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package software.amazon.nextflow.rules.healthomics
 
 import org.codehaus.groovy.ast.expr.ConstantExpression
@@ -22,7 +27,7 @@ class MissingProcessDirectivesVisitor extends AbstractAstVisitor {
     boolean declaresMemory = false
     boolean declaresContainer = false
     String processName = null
-    int nestedProcessMethodDepth = 0;
+    int nestedProcessMethodDepth = 0
 
     @Override
     void visitMethodCallExpression(MethodCallExpression node) {

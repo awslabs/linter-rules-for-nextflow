@@ -1,3 +1,8 @@
+/*
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package software.amazon.nextflow.rules.utils
 
 class HealthOmicsNFUtils {
@@ -5,7 +10,7 @@ class HealthOmicsNFUtils {
             'afterScript',
             'arch',
             'beforeScript',
-            'cache',        //will be allowed when we have call caching
+            'cache',        // enable when we have call caching
             'clusterOptions',
             'conda',
             'containerOptions',
@@ -24,6 +29,6 @@ class HealthOmicsNFUtils {
             'spack',
             'stageInMode',
             'stageOutMode',
-            'storeDir',     //might be allowed when we have call caching
+            'storeDir',     // possibly enable when we have call caching
     ]
 }

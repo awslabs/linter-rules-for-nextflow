@@ -1,3 +1,8 @@
+/*
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package software.amazon.nextflow.rules.healthomics
 
 import org.codehaus.groovy.ast.expr.ConstantExpression
@@ -50,7 +55,7 @@ class MemoryRuleAstVisitor extends AbstractAstVisitor {
             return
         }
 
-        def num = Integer.parseInt(matcher[0][1])
+        def num = matcher[0][1] as int
 
         if (num < MIN_MEM) {
             addViolation(expression, "The minimum memory allowed in AWS HealthOmics is $MIN_MEM GB. " +

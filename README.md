@@ -30,7 +30,7 @@ wget https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.
 wget https://repo1.maven.org/maven2/org/slf4j/slf4j-simple/1.7.36/slf4j-simple-1.7.36.jar
 ```
 
-You will also need an installation of Java (at least version 1.8 but 11 or higher is preferable). To test for the existence
+You will also need an installation of Java (at least version 1.8 but 17 or higher is preferable). To test for the existence
 of Java you can run
 ```shell
 java -version
@@ -97,6 +97,8 @@ docker run -v $PWD/examples:/data hox-nf-rules ./echo-tree.sh /data/example.nf
 ```
 
 ## Development
+
+We currently use Groovy 3.0.18 and Java 17 for development.
 
 ### Add a rule
 

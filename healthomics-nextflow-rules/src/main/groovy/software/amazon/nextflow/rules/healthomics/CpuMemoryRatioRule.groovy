@@ -1,3 +1,8 @@
+/*
+ * Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
 package software.amazon.nextflow.rules.healthomics
 
 import org.codehaus.groovy.ast.expr.ConstantExpression
@@ -72,7 +77,7 @@ class CpuMemoryRatioAstVisitor extends AbstractAstVisitor {
             def matcher = value =~ /(\d+)\s+GB/
 
             if (matcher.size() == 1){
-                return Integer.parseInt(matcher[0][1])
+                return matcher[0][1] as int
             }
         }
         return 0

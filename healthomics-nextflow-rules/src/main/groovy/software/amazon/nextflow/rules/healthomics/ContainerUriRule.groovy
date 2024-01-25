@@ -40,6 +40,6 @@ class ContainerUriAstVisitor extends AbstractAstVisitor {
         }
 
 
-        super.visitMethodCallExpression(expression);
+        super.visitMethodCallExpression(expression)
     }
 }
