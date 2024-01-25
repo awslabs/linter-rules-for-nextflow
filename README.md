@@ -4,13 +4,16 @@ Because Nextflow DSL2 is a Groovy DSL it is possible to parse it syntactically w
 Abstract Syntax Tree using a Groovy static analysis tool (linter) like [CodeNarc](https://codenarc.org/).
 
 This means that we can create custom CodeNarc rules that inspect Nextflow scripts (or config files) to detect and report
-potential issues. 
+potential issues.
+
+## License
+This repository is distributed under the terms of the Apache 2 license. Full details are in the [LICENSE](./LICENSE) file.
 
 ## Build
 To build this library you can use
 
 ```shell
-./gradlew clean jar shadowJar
+./gradlew clean build
 ```
 
 The resulting jar files will be found in `healthomics-nextflow-rules/build/libs/` and `ast-echo/build/libs`
@@ -63,7 +66,7 @@ A `Dockerfile` is provided for this project which will build an image that conta
 required JAR files. To build the container:
 
 ```shell
-docker build -t hox-nf-rules .
+docker build -t healthomics-nextflow-rules .
 ```
 
 The container is configured to (by default) run the HealthOmics Nextflow rules against all Nextflow (`*.nf`) files found 
@@ -71,7 +74,7 @@ in the `data` volume. For example, to check the files in the `examples/` folder:
 
 ```shell
 cd examples
-docker run -v $PWD:/data hox-nf-rules
+docker run -v $PWD:/data healthomics-nextflow-rules
 ```
 
 which will produce a report similar to:
@@ -93,7 +96,7 @@ CodeNarc completed: (p1=3; p2=0; p3=0) 1757ms
 The container also contains the `ast-echo` application along with a script to run it (`echo-tree.sh`). For example:
 
 ```shell
-docker run -v $PWD/examples:/data hox-nf-rules ./echo-tree.sh /data/example.nf
+docker run -v $PWD/examples:/data healthomics-nextflow-rules ./echo-tree.sh /data/example.nf
 ```
 
 ## Development

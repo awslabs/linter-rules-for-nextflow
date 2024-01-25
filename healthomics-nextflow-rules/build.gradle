@@ -7,6 +7,7 @@ plugins {
 
     // Apply the intellij idea plugin, used below to download source and javadocs for dependencies (see idea { ... })
     id 'idea'
+
 }
 
 group = 'software.amazon.healthomics'
@@ -24,14 +25,11 @@ dependencies {
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'org.codenarc:CodeNarc:3.2.0'
 
-    // Use the awesome Spock testing and specification framework even with Java
     testImplementation 'org.spockframework:spock-core:2.2-groovy-3.0'
     testImplementation 'junit:junit:4.13.2'
 
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // This dependency is exported to consumers, that is to say found on their compile classpath.
-    // api 'org.apache.commons:commons-math3:3.6.1'
 }
 
 idea {
