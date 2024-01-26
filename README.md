@@ -108,7 +108,7 @@ We currently use Groovy 3.0.18 and Java 17 for development.
 
 ### Add a rule
 
-CodeNarc rules are typically implemented using the [visitor pattern](https://en.wikipedia.org/wiki/Visitor_pattern. Rules
+CodeNarc rules are typically implemented using the [visitor pattern](https://en.wikipedia.org/wiki/Visitor_pattern). Rules
 that follow this pattern will extend the `org.codenarc.rule.AbstractAstVisitorRule` and declare a "companion" visitor
 class that extends the `org.codenarc.rule.AbstractAstVisitor`.  The `AbstractAstVisitor` defines several methods beginning
 with `visit` such as `visitMethodCallExpression(MethodCallExpression expression)`. The visitor class associated with the
