@@ -10,7 +10,7 @@ RUN ./gradlew clean jar shadowJar
 WORKDIR /work
 
 RUN cp src/ast-echo/build/libs/ast-echo-*-all.jar ./ast-echo-all.jar && \
-    cp src/healthomics-nextflow-rules/build/libs/healthomics-nextflow-rules-*.jar ./healthomics-nextflow-rules.jar && \
+    cp src/linter-rules/build/libs/linter-rules-*.jar ./linter-rules.jar && \
     cp src/scripts/check.sh ./check.sh && \
     cp src/scripts/echo-tree.sh ./echo-tree.sh && \
     rm -rf src

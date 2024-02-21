@@ -1,6 +1,6 @@
-# HealthOmics Rules for Nextflow Scripts
+# Linter Rules for Nextflow
 
-The HealthOmics Rules for Nextlfow Scripts is a collection of CodeNarc rules designed to lint Nextflow DSL scripts and
+Linter Rules for Nextlfow is a collection of CodeNarc rules designed to lint [Nextflow](https://www.nextflow.io/) DSL scripts and
 spot potential problems before a workflow script is run.
 
 Because Nextflow DSL2 is a Groovy DSL it is possible to parse it syntactically with a Groovy parser and inspect it's
@@ -49,14 +49,14 @@ Assuming your have built this library (see "Build" above) you can run the follow
 
 ```shell
 java  -Dorg.slf4j.simpleLogger.defaultLogLevel=error \
-  -classpath ./healthomics-nextflow-rules/build/libs/healthomics-nextflow-rules-0.1.jar:CodeNarc-3.3.0-all.jar:slf4j-api-1.7.36.jar:slf4j-simple-1.7.36.jar \
+  -classpath ./linter-rules/build/libs/linter-rules-for-nextflow-0.1.jar:CodeNarc-3.3.0-all.jar:slf4j-api-1.7.36.jar:slf4j-simple-1.7.36.jar \
   org.codenarc.CodeNarc \
   -report=text:stdout \
   -rulesetfiles=rulesets/healthomics.xml \
   -includes=**/**.nf
 ```
 
-If you jar files are in different locations adjust the `-classpath` line as appropriate. All lines after 
+If your jar files are in different locations adjust the `-classpath` line as appropriate. All lines after 
 `org.codenarc.CodeNarc` are CodeNarc [command line parameters](https://codenarc.org/codenarc-command-line.html#codenarc-command-line-parameters)
 
 Here we have configured CodeNarc to use the rules in `rulesets/healthomics.xml` which is defined in this library and
@@ -69,15 +69,15 @@ A `Dockerfile` is provided for this project which will build an image that conta
 required JAR files. To build the container:
 
 ```shell
-docker build -t healthomics-nextflow-rules .
+docker build -t linter-rules-for-nextflow .
 ```
 
-The container is configured to (by default) run the HealthOmics Nextflow rules against all Nextflow (`*.nf`) files found 
+The container is configured to (by default) run all rules herein against all Nextflow (`*.nf`) files found 
 in the `data` volume. For example, to check the files in the `examples/` folder:
 
 ```shell
 cd examples
-docker run -v $PWD:/data healthomics-nextflow-rules
+docker run -v $PWD:/data linter-rules-for-nextflow
 ```
 
 which will produce a report similar to:
@@ -99,7 +99,7 @@ CodeNarc completed: (p1=3; p2=0; p3=0) 1757ms
 The container also contains the `ast-echo` application along with a script to run it (`echo-tree.sh`). For example:
 
 ```shell
-docker run -v $PWD/examples:/data healthomics-nextflow-rules ./echo-tree.sh /data/example.nf
+docker run -v $PWD/examples:/data linter-rules-for-nextflow ./echo-tree.sh /data/example.nf
 ```
 
 ## Development
@@ -120,7 +120,7 @@ also not immediately obvious how Nextflow statements and expressions are semanti
 this package includes a Java application (AstEchoCli) that will echo the Groovy Abstract Syntax Tree for any Nextflow script or other valid
 Groovy or Groovy DSL. Consult the README.md in the `ast-echo` folder of this project for build and usage instructions.
 
-New rules should be added to the appropriate package in `/healthomics-nextflow-rules/src/groovy`.
+New rules should be added to the appropriate package in `./linter-rules/src/groovy`.
 
 A rule consists of a Rule and an ASTVisitor typically in the same groovy file. The Rule `class` should extend `AbstractAstVisitorRule`
 
