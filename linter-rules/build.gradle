@@ -20,7 +20,7 @@ repositories {
 
 dependencies {
     // Use Groovy for building this library
-    implementation 'org.codehaus.groovy:groovy-all:3.0.20'
+    implementation 'org.codehaus.groovy:groovy-all:3.0.21'
 
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     implementation 'org.codenarc:CodeNarc:3.4.0'
