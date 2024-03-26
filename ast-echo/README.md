@@ -11,7 +11,7 @@ of this repository.
 
 ```shell
 ./gradlew :ast-echo:clean
-./gradlew :ast-echo:shadowJar
+./gradlew :ast-echo:jar
 ```
 
 This will produce an executable jar file in `ast-echo/build/libs/` called `ast-echo-<version>-all.jar`
