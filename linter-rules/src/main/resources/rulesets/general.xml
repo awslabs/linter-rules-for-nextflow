@@ -1,0 +1,15 @@
+<!--
+    Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+    SPDX-License-Identifier: Apache-2.0
+-->
+<ruleset xmlns="http://codenarc.org/ruleset/1.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://codenarc.org/ruleset/1.0 http://codenarc.org/ruleset-schema.xsd">
+    <description>
+        Rules that detect Nextflow constructs that are likely to cause problems when run in AWS HealthOmics workflows.
+    </description>
+
+    <!-- Nextflow rules -->
+    <rule class="software.amazon.nextflow.rules.AllowedDirectivesRule"/>
+    <rule class="software.amazon.nextflow.rules.ModuleIncludedTwiceRule"/>
+</ruleset>
