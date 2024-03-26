@@ -11,6 +11,7 @@
 
     <!-- Nextflow rules -->
     <rule class="software.amazon.nextflow.rules.AllowedDirectivesRule"/>
+    <rule class="software.amazon.nextflow.rules.ModuleIncludedTwiceRule"/>
 
     <!-- Nextflow on HealthOmics rules -->
     <rule class="software.amazon.nextflow.rules.healthomics.AllowedHealthOmicsDirectivesRule"/>
