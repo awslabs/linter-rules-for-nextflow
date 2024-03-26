@@ -1,15 +1,15 @@
 FROM public.ecr.aws/amazonlinux/amazonlinux:2023
 
-RUN dnf install java wget /usr/bin/xargs -y
+RUN dnf install java-17 wget /usr/bin/xargs -y
 
 WORKDIR /work
 COPY . ./src
 
 WORKDIR /work/src
-RUN ./gradlew clean jar shadowJar
+RUN ./gradlew clean build
 WORKDIR /work
 
-RUN cp src/ast-echo/build/libs/ast-echo-*-all.jar ./ast-echo-all.jar && \
+RUN cp src/ast-echo/build/libs/ast-echo-*.jar ./ast-echo-all.jar && \
     cp src/linter-rules/build/libs/linter-rules-*.jar ./linter-rules.jar && \
     cp src/scripts/check.sh ./check.sh && \
     cp src/scripts/echo-tree.sh ./echo-tree.sh && \
