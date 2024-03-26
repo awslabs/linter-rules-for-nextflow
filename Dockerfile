@@ -19,4 +19,5 @@ RUN wget https://repo1.maven.org/maven2/org/codenarc/CodeNarc/3.3.0/CodeNarc-3.3
     wget https://repo1.maven.org/maven2/org/slf4j/slf4j-api/1.7.36/slf4j-api-1.7.36.jar && \
     wget https://repo1.maven.org/maven2/org/slf4j/slf4j-simple/1.7.36/slf4j-simple-1.7.36.jar
 
-CMD bash check.sh
+ENV ruleset "healthomics"
+ENTRYPOINT bash check.sh ${ruleset}

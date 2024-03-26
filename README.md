@@ -63,6 +63,19 @@ Here we have configured CodeNarc to use the rules in `rulesets/healthomics.xml` 
 contained in this libraries JAR file. The `-includes` parameter takes an Ant style pattern. This pattern will inspect
 all `*.nf` files at the current location and in subdirectories.
 
+### General NF Rules only
+If you only wish to check general Nextflow lint rules and not include those specialized to AWS HealthOmics then you can
+run:
+
+```shell
+java  -Dorg.slf4j.simpleLogger.defaultLogLevel=error \
+  -classpath ./linter-rules/build/libs/linter-rules-0.1.jar:CodeNarc-3.3.0-all.jar:slf4j-api-1.7.36.jar:slf4j-simple-1.7.36.jar \
+  org.codenarc.CodeNarc \
+  -report=text:stdout \
+  -rulesetfiles=rulesets/general.xml \
+  -includes=**/**.nf
+```
+
 ### Docker
 
 A `Dockerfile` is provided for this project which will build an image that contains the scripts in `scripts/` and the
@@ -95,6 +108,18 @@ File: example.nf
 [CodeNarc (https://codenarc.org) v3.3.0]
 CodeNarc completed: (p1=3; p2=0; p3=0) 1757ms
 ```
+
+#### General Rules Only
+
+If you only want to check the general rules using the container you can set the `ruleset` environment variable to `general`
+as follows:
+
+```shell
+cd examples
+docker run -v $PWD:/data -e ruleset=general linter-rules-for-nextflow
+```
+
+#### AST Echo
 
 The container also contains the `ast-echo` application along with a script to run it (`echo-tree.sh`). For example:
 
@@ -227,8 +252,9 @@ To run a specific test method in a test class:
 
 ### Update the Ruleset
 
-When a rule is created it should be added to the `resources/rulesets/healthomics.xml` file. Entries use the fully 
-qualified class name of the rule. Assuming the new Rule is called `NewRule` and the package is 
+When a rule is created it should be added to the `linter-rules/src/resources/rulesets/healthomics.xml` file. If the rule is general to any
+Nextflow environment then it should **also** be added to the `linter-rules/src/resources/rulesets/general.xml`
+Entries use the fully qualified class name of the rule. Assuming the new Rule is called `NewRule` and the package is 
 `software.amazon.nextflow.rules.healthomics`, the rule to be added will be:
 
 ```xml
