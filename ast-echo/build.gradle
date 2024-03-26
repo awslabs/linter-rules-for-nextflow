@@ -29,6 +29,7 @@ test {
 
 compileJava {
     options.compilerArgs += ["-Aproject=${project.group}/${project.name}"]
+    options.encoding = "UTF-8"
 }
 
 jar {
@@ -38,5 +39,5 @@ jar {
     from {
         configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
     }
-    duplicatesStrategy = "include"
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
