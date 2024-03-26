@@ -11,7 +11,7 @@ class NFUtils {
             'containerOptions', 'cpus', 'debug', 'disk', 'echo', 'errorStrategy', 'executor', /*'ext'*/ 'fair', 'label',
             'machineType', 'maxSubmitAwait', 'maxErrors', 'maxForks', 'maxRetries', 'memory', 'module', 'penv', 'pod',
             'publishDir', 'queue', 'resourceLabels', 'scratch', 'shell', 'spack', 'stageInMode', 'stageOutMode', 'storeDir',
-            'tag', 'time'
+            'tag', 'time', 'template'
     ]
 
     def static ALLOWED_NF_INPUTS_DIRECTIVES = [

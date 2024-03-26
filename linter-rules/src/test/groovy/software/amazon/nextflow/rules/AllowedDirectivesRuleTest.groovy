@@ -593,4 +593,47 @@ process big_job {
 '''
         assertNoViolations(SOURCE)
     }
+
+    @Test
+    void ifStatements_NoViolations(){
+        final SOURCE = '''
+process FASTP {
+    script:
+    if ( task.ext.args?.contains('--interleaved_in') ) {
+        """
+        command
+        """
+    } else if (meta.single_end) {
+        """
+        command
+        """
+    } else {
+        def merge_fastq = save_merged ? "-m --merged_out ${prefix}.merged.fastq.gz" : ''
+        """
+        command
+        """
+    }
+}
+
+'''
+        assertNoViolations(SOURCE)
+    }
+
+    @Test
+    void templateScript_NoViolations() {
+        final SOURCE = '''
+process templateExample {
+    input:
+    val STR
+
+    script:
+    template 'my_script.sh'
+}
+
+workflow {
+    Channel.of('this', 'that') | templateExample
+}
+'''
+        assertNoViolations(SOURCE)
+    }
 }

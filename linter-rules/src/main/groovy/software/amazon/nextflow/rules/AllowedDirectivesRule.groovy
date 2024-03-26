@@ -6,6 +6,7 @@
 package software.amazon.nextflow.rules
 
 import org.codehaus.groovy.ast.expr.MethodCallExpression
+import org.codehaus.groovy.ast.stmt.IfStatement
 import org.codenarc.rule.AbstractAstVisitor
 import org.codenarc.rule.AbstractAstVisitorRule
 import software.amazon.nextflow.rules.utils.NFUtils
@@ -22,6 +23,7 @@ class AllowedDirectivesRule extends AbstractAstVisitorRule{
 
 class AllowedDirectivesAstVisitor extends AbstractAstVisitor {
     int nestedProcessMethodDepth = 0
+    boolean inIfStatement = false
 
     @Override
     void visitMethodCallExpression(MethodCallExpression node) {
@@ -33,6 +35,8 @@ class AllowedDirectivesAstVisitor extends AbstractAstVisitor {
 
             // at depth 3 method calls are process directives
             if (nestedProcessMethodDepth == 3 &&
+                    node.text.startsWith("this."+methodName) &&
+                    !inIfStatement &&                                         // false positives
                     !(methodName in NFUtils.ALLOWED_NF_INPUTS_DIRECTIVES) &&  // these are allowed method calls
                     !(methodName in NFUtils.ALLOWED_NF_OUTPUTS_DIRECTIVES) && // also allowed method calls
                     !(methodName in NFUtils.ALLOWED_NF_PROCESS_DIRECTIVES)    // process directives (method calls)
@@ -44,5 +48,12 @@ class AllowedDirectivesAstVisitor extends AbstractAstVisitor {
 
         super.visitMethodCallExpression(node)
         nestedProcessMethodDepth --
+    }
+
+    @Override
+    void visitIfElse(IfStatement statement) {
+        inIfStatement = true
+        super.visitIfElse(statement)
+        inIfStatement = false
     }
 }
