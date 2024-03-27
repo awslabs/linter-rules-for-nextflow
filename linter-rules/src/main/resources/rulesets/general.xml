@@ -15,4 +15,5 @@
     <rule class="software.amazon.nextflow.rules.JoinMismatchRule"/>
     <rule class="software.amazon.nextflow.rules.JoinDuplicateRule"/>
     <rule class="software.amazon.nextflow.rules.ProcessWithoutCpuRule"/>
+    <rule class="software.amazon.nextflow.rules.ProcessWithoutMemoryRule"/>
 </ruleset>
