@@ -14,6 +14,8 @@
     <rule class="software.amazon.nextflow.rules.ModuleIncludedTwiceRule"/>
     <rule class="software.amazon.nextflow.rules.JoinMismatchRule"/>
     <rule class="software.amazon.nextflow.rules.JoinDuplicateRule"/>
+    <rule class="software.amazon.nextflow.rules.ProcessWithoutCpuRule"/>
+
 
     <!-- Nextflow on HealthOmics rules -->
     <rule class="software.amazon.nextflow.rules.healthomics.AllowedHealthOmicsDirectivesRule"/>
