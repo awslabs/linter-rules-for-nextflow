@@ -18,6 +18,7 @@
     <rule class="software.amazon.nextflow.rules.ProcessWithoutMemoryRule"/>
     <rule class="software.amazon.nextflow.rules.ProcessWithoutExecEnvironmentRule"/>
     <rule class="software.amazon.nextflow.rules.ProcessWithoutOutputRule"/>
+    <rule class="software.amazon.nextflow.rules.ProcessWithoutInputRule"/>
 
     <!-- Nextflow on HealthOmics rules -->
     <rule class="software.amazon.nextflow.rules.healthomics.AllowedHealthOmicsDirectivesRule"/>
