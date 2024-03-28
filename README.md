@@ -1,3 +1,6 @@
+[![Java CI with Gradle](https://github.com/awslabs/linter-rules-for-nextflow/actions/workflows/gradle.yml/badge.svg)](https://github.com/linter-rules-for-nextflow/actions/workflows/gradle.yml)
+
+
 # Linter Rules for Nextflow
 
 Linter Rules for Nextlfow is a collection of CodeNarc rules designed to lint [Nextflow](https://www.nextflow.io/) DSL scripts and
