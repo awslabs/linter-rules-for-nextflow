@@ -1,5 +1,6 @@
 [![Java CI with Gradle](https://github.com/awslabs/linter-rules-for-nextflow/actions/workflows/gradle.yml/badge.svg)](https://github.com/linter-rules-for-nextflow/actions/workflows/gradle.yml)
-
+[![Github All Releases](https://img.shields.io/github/downloads/awslabs/linter-rules-for-nextflow/total.svg)]()
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 # Linter Rules for Nextflow
 
