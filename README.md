@@ -83,7 +83,9 @@ java  -Dorg.slf4j.simpleLogger.defaultLogLevel=error \
 ### Docker
 
 A `Dockerfile` is provided for this project which will build an image that contains the scripts in `scripts/` and the
-required JAR files. To build the container:
+required JAR files. Recent copies of the container image are publically available from [ECR Public Gallery](https://gallery.ecr.aws/aws-genomics/linter-rules-for-nextflow).
+
+If you prefer to build the container from source:
 
 ```shell
 docker build -t linter-rules-for-nextflow .
