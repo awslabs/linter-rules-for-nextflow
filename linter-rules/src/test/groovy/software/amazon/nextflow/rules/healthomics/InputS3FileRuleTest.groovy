@@ -31,18 +31,12 @@ class InputS3FileRuleTest extends AbstractRuleTestCase<InputS3FileRule> {
     @Test
     void filePath_NoViolations() {
        final SOURCE = '''
-            params {
-                publishDir = "s3://my-output-bucket/results"
-            }
 
             process processData {
-                publishDir params.publishDir
-                cpus 1
 
                 input:
-                path "s3://my-input-bucket/data/input1.txt"
-                path "s3://my-input-bucket/data/input2.txt"
-
+                  path "s3://my-input-bucket/data/input1.txt"
+                  path "s3://my-input-bucket/data/input2.txt"
 
                 """
                 echo "All input files are valid S3 paths."
