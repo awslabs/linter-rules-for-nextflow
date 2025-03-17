@@ -17,11 +17,11 @@ import org.junit.jupiter.api.Test
 
 class InputS3FileRuleTest extends AbstractRuleTestCase<InputS3FileRule> {
 
-    @Override                                                                                                                           
-    protected InputS3FileRule createRule() {                                                                                                    
-        new InputS3FileRule()                                                                                                                   
-    }                                                                                                                                   
-           
+    @Override
+    protected InputS3FileRule createRule() {
+        new InputS3FileRule()
+    }
+
     @Test
     void RuleProperties() {
         assert rule.priority == 1
@@ -31,9 +31,7 @@ class InputS3FileRuleTest extends AbstractRuleTestCase<InputS3FileRule> {
     @Test
     void filePath_NoViolations() {
        final SOURCE = '''
-
-            process processData {
-
+            process bar {
                 input:
                   path "s3://my-input-bucket/data/input1.txt"
                   path "s3://my-input-bucket/data/input2.txt"
@@ -47,14 +45,47 @@ class InputS3FileRuleTest extends AbstractRuleTestCase<InputS3FileRule> {
     }
 
     @Test
-    void filePath_OneViolation() {
+    void filePath_TooManyArgsViolations() {
        final SOURCE = '''
-
-            process foo {
+            process bar {
                 input:
-                path '/home/data/input1.txt'
+                  path 's3://my-input-bucket/data/input1.txt', 's3://my-input-bucket/data/input2.txt'
             }
         '''
-        assertSingleViolation(SOURCE, 5, "path '/home/data/input1.txt'", "The file path URI '/home/data/input1.txt' does not match the pattern 's3://.*'. Replace with a file located on s3.")
+        assertSingleViolation(SOURCE, 4, "path 's3://my-input-bucket/data/input1.txt', 's3://my-input-bucket/data/input2.txt'","The path directive must have exactly one argument.")
+    }
+
+    @Test
+    void filePath_LocalPathViolation() {
+       final SOURCE = '''
+            process foo {
+                input:
+                  path '/home/data/input1.txt'
+            }
+        '''
+        assertSingleViolation(SOURCE, 4, "path '/home/data/input1.txt'", "The file path '/home/data/input1.txt' does not match the pattern 's3://.*'. Replace with an S3 object URI.")
+    }
+
+    @Test
+    void filePathParam_NoViolations() {
+       final SOURCE = '''
+
+            process baz {
+                input:
+                  path params.infile
+            }
+        '''
+        assertNoViolations(SOURCE)
+    }
+
+    @Test
+    void filePathParam_OneViolations() {
+       final SOURCE = '''
+            process baz {
+                input:
+                  path par.infile
+            }
+        '''
+        assertSingleViolation(SOURCE, 4, "path par.infile", "The file path must be either a string or params.")
     }
 }
