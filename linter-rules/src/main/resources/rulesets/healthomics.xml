@@ -31,5 +31,6 @@
     <rule class="software.amazon.nextflow.rules.healthomics.MissingProcessDirectivesRule"/>
     <rule class="software.amazon.nextflow.rules.healthomics.PublishDirRule"/>
     <rule class="software.amazon.nextflow.rules.healthomics.GpuRule"/>
+    <rule class="software.amazon.nextflow.rules.healthomics.InputS3FileRule"/>
     
 </ruleset>
