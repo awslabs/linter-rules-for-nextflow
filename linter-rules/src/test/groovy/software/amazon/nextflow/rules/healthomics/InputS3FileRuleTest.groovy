@@ -31,28 +31,12 @@ class InputS3FileRuleTest extends AbstractRuleTestCase<InputS3FileRule> {
     @Test
     void filePath_NoViolations() {
        final SOURCE = '''
-            process bar {
+            process foo {
                 input:
-                  path "s3://my-input-bucket/data/input1.txt"
-                  path "s3://my-input-bucket/data/input2.txt"
-
-                """
-                echo "All input files are valid S3 paths."
-                """
+                  path 's3://my-input-bucket/data/bar.txt'
             }
         '''
         assertNoViolations(SOURCE)
-    }
-
-    @Test
-    void filePath_TooManyArgsViolations() {
-       final SOURCE = '''
-            process bar {
-                input:
-                  path 's3://my-input-bucket/data/input1.txt', 's3://my-input-bucket/data/input2.txt'
-            }
-        '''
-        assertSingleViolation(SOURCE, 4, "path 's3://my-input-bucket/data/input1.txt', 's3://my-input-bucket/data/input2.txt'","The path directive must have exactly one argument.")
     }
 
     @Test
@@ -60,32 +44,76 @@ class InputS3FileRuleTest extends AbstractRuleTestCase<InputS3FileRule> {
        final SOURCE = '''
             process foo {
                 input:
-                  path '/home/data/input1.txt'
+                  path '/home/bar/baz.txt'
             }
         '''
-        assertSingleViolation(SOURCE, 4, "path '/home/data/input1.txt'", "The file path '/home/data/input1.txt' does not match the pattern 's3://.*'. Replace with an S3 object URI.")
+        assertSingleViolation(SOURCE, 4, "path '/home/bar/baz.txt'","The file path '/home/bar/baz.txt' does not match the pattern 's3://.*'. Replace with an S3 object URI.")
+    }
+
+    @Test
+    void filePath_HttpPathViolation() {
+       final SOURCE = '''
+            process foo {
+                input:
+                  path 'http://example.com/bar.txt'
+            }
+        '''
+        assertSingleViolation(SOURCE, 4, "path 'http://example.com/bar.txt'","The file path 'http://example.com/bar.txt' does not match the pattern 's3://.*'. Replace with an S3 object URI.")
+    }
+
+    @Test
+    void filePath_FtpPathViolation() {
+       final SOURCE = '''
+            process foo {
+                input:
+                  path 'ftp://example.com/bar.txt'
+            }
+        '''
+        assertSingleViolation(SOURCE, 4, "path 'ftp://example.com/bar.txt'","The file path 'ftp://example.com/bar.txt' does not match the pattern 's3://.*'. Replace with an S3 object URI.")
     }
 
     @Test
     void filePathParam_NoViolations() {
        final SOURCE = '''
-
-            process baz {
+            process foo {
                 input:
-                  path params.infile
+                  path bar.baz
             }
         '''
         assertNoViolations(SOURCE)
     }
 
     @Test
-    void filePathParam_OneViolations() {
+    void filePathVariable_NoViolations() {
        final SOURCE = '''
-            process baz {
+            process foo {
                 input:
-                  path par.infile
+                  path bar
             }
         '''
-        assertSingleViolation(SOURCE, 4, "path par.infile", "The file path must be either a string or params.")
+        assertNoViolations(SOURCE)
     }
+
+    @Test
+    void filePathExpression1_NoViolations() {
+       final SOURCE = '''
+            process foo {
+                input:
+                    path '${bar}.txt'
+            }
+        '''
+        assertNoViolations(SOURCE)
+    }
+
+    @Test
+    void filePathExpression2_NoViolations() {
+       final SOURCE = '''
+            process foo {
+                input:
+                    path '${params.bar}/${baz}.txt'
+            }
+        '''
+        assertNoViolations(SOURCE)
+    }
+
 }
