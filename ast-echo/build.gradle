@@ -16,7 +16,7 @@ repositories {
 
 dependencies {
     implementation 'info.picocli:picocli:4.7.7'
-    implementation 'org.codehaus.groovy:groovy-all:3.0.24'  // to get access to the GroovyAST and support
+    implementation 'org.codehaus.groovy:groovy-all:3.0.25'  // to get access to the GroovyAST and support
     annotationProcessor 'info.picocli:picocli-codegen:4.7.7'
 
     testImplementation platform('org.junit:junit-bom:5.13.0')
