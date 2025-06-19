@@ -125,6 +125,22 @@ cd examples
 docker run -v $PWD:/data -e ruleset=general linter-rules-for-nextflow
 ```
 
+#### Fail on Violations
+
+You can configure the container to exit with a non-zero code when violations are detected by using the `check.sh` script with the `--fail-on-violations` option:
+
+```shell
+cd examples
+docker run -v $PWD:/data linter-rules-for-nextflow ./check.sh --fail-on-violations
+```
+
+This is particularly useful in CI/CD pipelines where you want the build to fail if code quality issues are detected. You can also combine this with ruleset selection:
+
+```shell
+cd examples
+docker run -v $PWD:/data linter-rules-for-nextflow ./check.sh --fail-on-violations general
+```
+
 #### AST Echo
 
 The container also contains the `ast-echo` application along with a script to run it (`echo-tree.sh`). For example:
@@ -139,6 +155,40 @@ This project contains helper scripts that you can install on your `$PATH` by cop
 
 - *`nextflow-lint.sh`* will run the linter against the container built from the `Dockerfile`.
 - *`nextflow-echo.sh`* will run the `ast-echo` application against the latest JAR build.
+
+#### nextflow-lint.sh Usage
+
+The `nextflow-lint.sh` script supports several options:
+
+```bash
+nextflow-lint.sh [--fail-on-violations] [--ruleset RULESET] [directory]
+```
+
+**Options:**
+- `--fail-on-violations`: Exit with code 1 if lint violations are found (useful for CI/CD pipelines)
+- `--ruleset RULESET`: Specify which ruleset to use (`healthomics` or `general`)
+- `directory`: Directory to lint (defaults to current directory)
+- `--help`: Display usage information
+
+**Examples:**
+```bash
+# Lint current directory with default ruleset
+nextflow-lint.sh
+
+# Lint specific directory
+nextflow-lint.sh /path/to/nextflow/project
+
+# Lint with general rules only
+nextflow-lint.sh --ruleset general
+
+# Lint and fail if violations found (for CI/CD)
+nextflow-lint.sh --fail-on-violations
+
+# Combine options
+nextflow-lint.sh --fail-on-violations --ruleset general /path/to/project
+```
+
+The `--fail-on-violations` option is particularly useful in CI/CD pipelines where you want the build to fail if code quality issues are detected.
 
 ## Development
 
