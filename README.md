@@ -133,6 +133,13 @@ The container also contains the `ast-echo` application along with a script to ru
 docker run -v $PWD/examples:/data linter-rules-for-nextflow ./echo-tree.sh /data/example.nf
 ```
 
+### Helper scripts
+
+This project contains helper scripts that you can install on your `$PATH` by copying them to `$HOME/.local/bin` or similar.
+
+- *`nextflow-lint.sh`* will run the linter against the container built from the `Dockerfile`.
+- *`nextflow-echo.sh`* will run the `ast-echo` application against the latest JAR build.
+
 ## Development
 
 We currently use Groovy 3.0.18 and Java 17 for development.
