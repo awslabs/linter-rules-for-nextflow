@@ -1,0 +1,477 @@
+plugins {
+    id 'base'
+}
+
+// Global version management
+allprojects {
+    group = 'software.amazon'
+    version = '0.1.1'
+}
+
+// Release automation tasks
+task checkGitStatus {
+    description = 'Checks if git working directory is clean'
+    doLast {
+        def statusOutput = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'status', '--porcelain'
+            standardOutput = statusOutput
+            ignoreExitValue = true
+        }
+        
+        def output = statusOutput.toString().trim()
+        if (!output.isEmpty()) {
+            throw new GradleException("Git working directory is not clean. Please commit or stash changes before releasing.")
+        }
+        println "✓ Git working directory is clean"
+    }
+}
+
+task getCurrentBranch {
+    description = 'Gets the current git branch'
+    doLast {
+        def branchOutput = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'rev-parse', '--abbrev-ref', 'HEAD'
+            standardOutput = branchOutput
+        }
+        
+        def branch = branchOutput.toString().trim()
+        project.ext.currentBranch = branch
+        println "Current branch: ${branch}"
+        
+        if (branch != 'main') {
+            throw new GradleException("Releases must be made from the 'main' branch. Current branch: ${branch}")
+        }
+        println "✓ On main branch"
+    }
+}
+
+task updateVersion {
+    description = 'Updates version in all build files'
+    doLast {
+        def newVersion = project.findProperty('releaseVersion')
+        if (!newVersion) {
+            throw new GradleException("Please specify -PreleaseVersion=x.y.z")
+        }
+        
+        println "Updating version to: ${newVersion}"
+        
+        // Update root build.gradle
+        def rootBuildFile = file('build.gradle')
+        def rootContent = rootBuildFile.text
+        rootContent = rootContent.replaceAll(/version = '[^']*'/, "version = '${newVersion}'")
+        rootBuildFile.text = rootContent
+        
+        // Update linter-rules build.gradle
+        def linterBuildFile = file('linter-rules/build.gradle')
+        def linterContent = linterBuildFile.text
+        linterContent = linterContent.replaceAll(/version = '[^']*'/, "version = '${newVersion}'")
+        linterBuildFile.text = linterContent
+        
+        // Update ast-echo build.gradle
+        def astBuildFile = file('ast-echo/build.gradle')
+        def astContent = astBuildFile.text
+        astContent = astContent.replaceAll(/version = '[^']*'/, "version = '${newVersion}'")
+        astBuildFile.text = astContent
+        
+        // Update AstEchoCli.java
+        def astCliFile = file('ast-echo/src/main/java/software/amazon/groovy/AstEchoCli.java')
+        def astCliContent = astCliFile.text
+        astCliContent = astCliContent.replaceAll(/version = "AstEchoCli [^"]*"/, "version = \"AstEchoCli ${newVersion}\"")
+        astCliFile.text = astCliContent
+        
+        // Update README.md
+        def readmeFile = file('README.md')
+        def readmeContent = readmeFile.text
+        readmeContent = readmeContent.replaceAll(/linter-rules-[0-9]+\.[0-9]+\.[0-9]+\.jar/, "linter-rules-${newVersion}.jar")
+        readmeFile.text = readmeContent
+        
+        println "✓ Updated version in all files"
+    }
+}
+
+task buildAll {
+    description = 'Builds all subprojects'
+    dependsOn ':linter-rules:build', ':ast-echo:build'
+    doLast {
+        println "✓ All projects built successfully"
+    }
+}
+
+task testAll {
+    description = 'Runs tests for all subprojects'
+    dependsOn ':linter-rules:test', ':ast-echo:test'
+    doLast {
+        println "✓ All tests passed"
+    }
+}
+
+task createGitTag {
+    description = 'Creates and pushes a git tag for the release'
+    doLast {
+        def newVersion = project.findProperty('releaseVersion')
+        if (!newVersion) {
+            throw new GradleException("Please specify -PreleaseVersion=x.y.z")
+        }
+        
+        def tagName = "v${newVersion}"
+        
+        // Create tag
+        exec {
+            commandLine 'git', 'tag', tagName
+        }
+        println "✓ Created tag: ${tagName}"
+        
+        // Push tag
+        exec {
+            commandLine 'git', 'push', 'origin', tagName
+        }
+        println "✓ Pushed tag: ${tagName}"
+    }
+}
+
+task commitVersionUpdate {
+    description = 'Commits version updates to git'
+    doLast {
+        def newVersion = project.findProperty('releaseVersion')
+        if (!newVersion) {
+            throw new GradleException("Please specify -PreleaseVersion=x.y.z")
+        }
+        
+        // Add all modified files
+        exec {
+            commandLine 'git', 'add', 'build.gradle', 'linter-rules/build.gradle', 'ast-echo/build.gradle', 
+                       'ast-echo/src/main/java/software/amazon/groovy/AstEchoCli.java', 'README.md'
+        }
+        
+        // Commit changes
+        exec {
+            commandLine 'git', 'commit', '-m', "chore: bump version to ${newVersion}"
+        }
+        println "✓ Committed version update"
+        
+        // Push changes
+        exec {
+            commandLine 'git', 'push', 'origin', 'main'
+        }
+        println "✓ Pushed version update"
+    }
+}
+
+task generateReleaseNotes {
+    description = 'Generates release notes from git commits'
+    doLast {
+        def newVersion = project.findProperty('releaseVersion')
+        if (!newVersion) {
+            throw new GradleException("Please specify -PreleaseVersion=x.y.z")
+        }
+        
+        // Get the previous tag
+        def tagOutput = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'describe', '--tags', '--abbrev=0', 'HEAD^'
+            standardOutput = tagOutput
+            ignoreExitValue = true
+        }
+        
+        def previousTag = tagOutput.toString().trim()
+        if (previousTag.isEmpty()) {
+            previousTag = "HEAD~10" // fallback if no previous tag
+        }
+        
+        // Get commits since previous tag
+        def logOutput = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'log', "${previousTag}..HEAD", '--pretty=format:- %s (%h)', '--no-merges'
+            standardOutput = logOutput
+        }
+        
+        def commits = logOutput.toString().trim()
+        
+        // Get current date
+        def releaseDate = new Date().format('yyyy-MM-dd')
+        
+        def releaseNotes = """# Release v${newVersion}
+
+**Release Date:** ${releaseDate}
+
+## Changes
+
+${commits}
+
+## Installation
+
+### JAR Files
+- linter-rules-${newVersion}.jar
+- ast-echo-${newVersion}.jar
+
+### Docker
+```bash
+docker pull public.ecr.aws/aws-genomics/linter-rules-for-nextflow:v${newVersion}
+```
+
+### Usage
+See the [README](README.md) for detailed usage instructions.
+
+## Checksums
+
+SHA256 checksums will be provided with the GitHub release.
+"""
+        
+        def releaseNotesFile = file("release-notes-v${newVersion}.md")
+        releaseNotesFile.text = releaseNotes
+        
+        println "✓ Generated release notes: ${releaseNotesFile.name}"
+        println "\nRelease Notes Preview:"
+        println "=" * 50
+        println releaseNotes
+        println "=" * 50
+    }
+}
+
+task generateChecksums {
+    description = 'Generates SHA256 checksums for release artifacts'
+    dependsOn buildAll
+    doLast {
+        def newVersion = project.findProperty('releaseVersion') ?: version
+        
+        def artifacts = [
+            "linter-rules/build/libs/linter-rules-${newVersion}.jar",
+            "ast-echo/build/libs/ast-echo-${newVersion}.jar"
+        ]
+        
+        def checksumFile = file("checksums-v${newVersion}.txt")
+        checksumFile.text = "# SHA256 Checksums for v${newVersion}\n\n"
+        
+        artifacts.each { artifactPath ->
+            def artifact = file(artifactPath)
+            if (artifact.exists()) {
+                def checksumOutput = new ByteArrayOutputStream()
+                exec {
+                    commandLine 'sha256sum', artifact.absolutePath
+                    standardOutput = checksumOutput
+                }
+                def checksum = checksumOutput.toString().trim()
+                checksumFile.append("${checksum}\n")
+                println "✓ Generated checksum for ${artifact.name}"
+            } else {
+                println "⚠️  Artifact not found: ${artifactPath}"
+            }
+        }
+        
+        println "✓ Checksums saved to: ${checksumFile.name}"
+    }
+}
+
+task release {
+    description = 'Performs a complete release: version update, build, test, commit, tag, and push'
+    group = 'release'
+    
+    doFirst {
+        def newVersion = project.findProperty('releaseVersion')
+        if (!newVersion) {
+            throw new GradleException("""
+Please specify the release version using -PreleaseVersion=x.y.z
+
+Example:
+  ./gradlew release -PreleaseVersion=0.1.2
+""")
+        }
+        
+        if (!newVersion.matches(/^\d+\.\d+\.\d+$/)) {
+            throw new GradleException("Version must follow semantic versioning format (x.y.z): ${newVersion}")
+        }
+        
+        println "Starting release process for version: ${newVersion}"
+    }
+    
+    dependsOn checkGitStatus, getCurrentBranch, updateVersion, testAll, buildAll, 
+              commitVersionUpdate, createGitTag, generateReleaseNotes, generateChecksums
+    
+    // Ensure proper task ordering
+    getCurrentBranch.mustRunAfter checkGitStatus
+    updateVersion.mustRunAfter getCurrentBranch
+    testAll.mustRunAfter updateVersion
+    buildAll.mustRunAfter testAll
+    commitVersionUpdate.mustRunAfter buildAll
+    createGitTag.mustRunAfter commitVersionUpdate
+    generateReleaseNotes.mustRunAfter createGitTag
+    generateChecksums.mustRunAfter generateReleaseNotes
+    
+    doLast {
+        def newVersion = project.findProperty('releaseVersion')
+        println """
+🎉 Release v${newVersion} completed successfully!
+
+Next steps:
+1. Review the generated release notes: release-notes-v${newVersion}.md
+2. Create a GitHub release at: https://github.com/awslabs/linter-rules-for-nextflow/releases/new?tag=v${newVersion}
+3. Upload the JAR files and checksums
+4. Consider building and pushing a new Docker image
+
+Artifacts created:
+- linter-rules/build/libs/linter-rules-${newVersion}.jar
+- ast-echo/build/libs/ast-echo-${newVersion}.jar
+- release-notes-v${newVersion}.md
+- checksums-v${newVersion}.txt
+
+Cleanup:
+  ./gradlew cleanReleaseArtifacts  # Remove release notes and checksums
+"""
+    }
+}
+
+task preRelease {
+    description = 'Performs pre-release checks without making changes'
+    group = 'release'
+    
+    doLast {
+        def newVersion = project.findProperty('releaseVersion')
+        if (!newVersion) {
+            throw new GradleException("Please specify -PreleaseVersion=x.y.z")
+        }
+        
+        println "Pre-release check for version: ${newVersion}"
+        
+        // Check git status
+        def statusOutput = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'status', '--porcelain'
+            standardOutput = statusOutput
+            ignoreExitValue = true
+        }
+        
+        def output = statusOutput.toString().trim()
+        if (!output.isEmpty()) {
+            println "⚠️  Git working directory has uncommitted changes:"
+            println output
+        } else {
+            println "✓ Git working directory is clean"
+        }
+        
+        // Check current branch
+        def branchOutput = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'rev-parse', '--abbrev-ref', 'HEAD'
+            standardOutput = branchOutput
+        }
+        
+        def branch = branchOutput.toString().trim()
+        if (branch != 'main') {
+            println "⚠️  Not on main branch (current: ${branch})"
+        } else {
+            println "✓ On main branch"
+        }
+        
+        // Check if tag already exists
+        def tagOutput = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'tag', '-l', "v${newVersion}"
+            standardOutput = tagOutput
+            ignoreExitValue = true
+        }
+        
+        def existingTag = tagOutput.toString().trim()
+        if (!existingTag.isEmpty()) {
+            println "⚠️  Tag v${newVersion} already exists"
+        } else {
+            println "✓ Tag v${newVersion} does not exist"
+        }
+        
+        println "\nPre-release check completed. Run './gradlew release -PreleaseVersion=${newVersion}' to proceed."
+    }
+}
+
+// Helper task to show current version
+task showVersion {
+    description = 'Shows the current version'
+    group = 'help'
+    doLast {
+        println "Current version: ${version}"
+    }
+}
+
+task cleanReleaseArtifacts {
+    description = 'Cleans up release artifacts (notes, checksums)'
+    group = 'release'
+    doLast {
+        def releaseFiles = fileTree('.') {
+            include 'release-notes-v*.md'
+            include 'checksums-v*.txt'
+        }
+        
+        releaseFiles.each { file ->
+            if (file.delete()) {
+                println "✓ Deleted: ${file.name}"
+            }
+        }
+        
+        if (releaseFiles.isEmpty()) {
+            println "No release artifacts to clean"
+        }
+    }
+}
+
+task listReleases {
+    description = 'Lists all git tags (releases)'
+    group = 'help'
+    doLast {
+        def tagOutput = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'tag', '-l', '--sort=-version:refname'
+            standardOutput = tagOutput
+        }
+        
+        def tags = tagOutput.toString().trim()
+        if (tags.isEmpty()) {
+            println "No releases found"
+        } else {
+            println "Available releases:"
+            tags.split('\n').each { tag ->
+                println "  ${tag}"
+            }
+        }
+    }
+}
+
+// Helper task to show available release tasks
+task releaseHelp {
+    description = 'Shows help for release tasks'
+    group = 'help'
+    doLast {
+        println """
+Release Tasks:
+
+./gradlew preRelease -PreleaseVersion=x.y.z
+  - Performs pre-release checks without making changes
+  - Validates git status, branch, and version format
+
+./gradlew release -PreleaseVersion=x.y.z  
+  - Performs complete release process:
+    1. Checks git status and branch
+    2. Updates version in all files
+    3. Runs tests and builds
+    4. Commits changes
+    5. Creates and pushes git tag
+    6. Generates release notes and checksums
+
+./gradlew generateChecksums
+  - Generates SHA256 checksums for built artifacts
+
+./gradlew cleanReleaseArtifacts
+  - Cleans up release notes and checksum files
+
+./gradlew listReleases
+  - Lists all available releases (git tags)
+
+./gradlew showVersion
+  - Shows current version
+
+Examples:
+  ./gradlew preRelease -PreleaseVersion=0.1.2
+  ./gradlew release -PreleaseVersion=0.1.2
+  ./gradlew generateChecksums
+"""
+    }
+}

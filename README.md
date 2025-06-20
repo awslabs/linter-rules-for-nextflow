@@ -327,3 +327,157 @@ Entries use the fully qualified class name of the rule. Assuming the new Rule is
 ```xml
 <rule class="software.amazon.nextflow.rules.healthomics.NewRule"/>
 ```
+
+## Release Management
+
+This project includes automated release management through Gradle tasks. The release automation handles version updates, testing, building, git operations, and artifact generation.
+
+### Quick Start
+
+```bash
+# Check what would happen in a release (dry run)
+./gradlew preRelease -PreleaseVersion=0.2.0
+
+# Perform a complete release
+./gradlew release -PreleaseVersion=0.2.0
+```
+
+### Release Process
+
+The automated release process performs the following steps:
+
+1. **Validation**
+   - Checks git working directory is clean
+   - Verifies you're on the `main` branch
+   - Validates version format (semantic versioning)
+
+2. **Version Updates**
+   - Updates version in all `build.gradle` files
+   - Updates version in `AstEchoCli.java`
+   - Updates JAR references in `README.md`
+
+3. **Testing & Building**
+   - Runs all tests across subprojects
+   - Builds all JAR artifacts
+
+4. **Git Operations**
+   - Commits version changes
+   - Creates and pushes git tag
+   - Pushes changes to remote
+
+5. **Documentation & Security**
+   - Generates release notes from commit history
+   - Creates SHA256 checksums for all artifacts
+
+### Available Commands
+
+#### Core Release Commands
+
+```bash
+# Dry run - validate release without making changes
+./gradlew preRelease -PreleaseVersion=x.y.z
+
+# Full automated release
+./gradlew release -PreleaseVersion=x.y.z
+```
+
+#### Utility Commands
+
+```bash
+# Show current version
+./gradlew showVersion
+
+# List all releases (git tags)
+./gradlew listReleases
+
+# Generate checksums for existing builds
+./gradlew generateChecksums
+
+# Clean up release artifacts (notes, checksums)
+./gradlew cleanReleaseArtifacts
+
+# Show detailed help
+./gradlew releaseHelp
+```
+
+### Release Artifacts
+
+After a successful release, the following artifacts are created:
+
+- **JAR Files**: `linter-rules-x.y.z.jar` and `ast-echo-x.y.z.jar`
+- **Release Notes**: `release-notes-vx.y.z.md` with commit history and installation instructions
+- **Checksums**: `checksums-vx.y.z.txt` with SHA256 hashes for security verification
+- **Git Tag**: `vx.y.z` pushed to the remote repository
+
+### GitHub Release
+
+After running the automated release, you'll need to manually create the GitHub release:
+
+1. Go to the [releases page](https://github.com/awslabs/linter-rules-for-nextflow/releases)
+2. Click "Create a new release"
+3. Select the tag that was just created (e.g., `v0.2.0`)
+4. Copy the content from the generated `release-notes-vx.y.z.md` file
+5. Upload the JAR files and checksums file as release assets
+
+### Version Guidelines
+
+This project follows [Semantic Versioning](https://semver.org/):
+
+- **MAJOR** (x.0.0): Breaking changes to rules or APIs
+- **MINOR** (0.x.0): New rules, features, or non-breaking enhancements
+- **PATCH** (0.0.x): Bug fixes, documentation updates, or minor improvements
+
+### Examples
+
+```bash
+# Patch release (bug fixes)
+./gradlew release -PreleaseVersion=0.1.2
+
+# Minor release (new features)
+./gradlew release -PreleaseVersion=0.2.0
+
+# Major release (breaking changes)
+./gradlew release -PreleaseVersion=1.0.0
+
+# Check what a release would do first
+./gradlew preRelease -PreleaseVersion=0.1.2
+```
+
+### Troubleshooting
+
+**Common Issues:**
+
+- **"Git working directory is not clean"**: Commit or stash your changes before releasing
+- **"Not on main branch"**: Switch to the main branch before releasing
+- **"Tag already exists"**: The version you're trying to release already exists
+- **"Version format invalid"**: Use semantic versioning format (x.y.z)
+
+**Recovery:**
+
+If a release fails partway through:
+
+1. Check the git status and recent commits
+2. If version files were updated but not tagged, you may need to reset:
+   ```bash
+   git reset --hard HEAD~1  # Only if the commit was made but tag failed
+   ```
+3. Clean up any generated artifacts:
+   ```bash
+   ./gradlew cleanReleaseArtifacts
+   ```
+4. Fix the underlying issue and retry the release
+
+### CI/CD Integration
+
+The release automation is designed to work well in CI/CD environments:
+
+```bash
+# In your CI pipeline
+./gradlew preRelease -PreleaseVersion=${VERSION}
+./gradlew release -PreleaseVersion=${VERSION}
+```
+
+Ensure your CI environment has:
+- Git configured with appropriate credentials
+- Push access to the repository
+- Java 17+ and Gradle available
