@@ -293,11 +293,11 @@ Example:
     getCurrentBranch.mustRunAfter checkGitStatus
     updateVersion.mustRunAfter getCurrentBranch
     testAll.mustRunAfter updateVersion
-    buildAll.mustRunAfter testAll
+    buildAll.mustRunAfter updateVersion  // Build after version update
     commitVersionUpdate.mustRunAfter buildAll
     createGitTag.mustRunAfter commitVersionUpdate
     generateReleaseNotes.mustRunAfter createGitTag
-    generateChecksums.mustRunAfter generateReleaseNotes
+    generateChecksums.mustRunAfter buildAll  // Generate checksums after build
     
     doLast {
         def newVersion = project.findProperty('releaseVersion')
