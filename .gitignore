@@ -7,3 +7,9 @@ build
 # Ignore IDE
 .idea
 
+# Ignore Apple DS_Store
+.DS_Store
+
+# Ignore checksums and release-notes
+checksums-v*.txt
+release-notes-v*.md
