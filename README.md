@@ -53,7 +53,7 @@ Assuming your have built this library (see "Build" above) you can run the follow
 
 ```shell
 java  -Dorg.slf4j.simpleLogger.defaultLogLevel=error \
-  -classpath ./linter-rules/build/libs/linter-rules-0.1.jar:CodeNarc-3.3.0-all.jar:slf4j-api-1.7.36.jar:slf4j-simple-1.7.36.jar \
+  -classpath ./linter-rules/build/libs/linter-rules-0.1.1.jar:CodeNarc-3.3.0-all.jar:slf4j-api-1.7.36.jar:slf4j-simple-1.7.36.jar \
   org.codenarc.CodeNarc \
   -report=text:stdout \
   -rulesetfiles=rulesets/healthomics.xml \
@@ -73,7 +73,7 @@ run:
 
 ```shell
 java  -Dorg.slf4j.simpleLogger.defaultLogLevel=error \
-  -classpath ./linter-rules/build/libs/linter-rules-0.1.jar:CodeNarc-3.3.0-all.jar:slf4j-api-1.7.36.jar:slf4j-simple-1.7.36.jar \
+  -classpath ./linter-rules/build/libs/linter-rules-0.1.1.jar:CodeNarc-3.3.0-all.jar:slf4j-api-1.7.36.jar:slf4j-simple-1.7.36.jar \
   org.codenarc.CodeNarc \
   -report=text:stdout \
   -rulesetfiles=rulesets/general.xml \
@@ -131,23 +131,27 @@ You can configure the container to exit with a non-zero code when violations are
 
 ```shell
 cd examples
-docker run -v $PWD:/data linter-rules-for-nextflow ./check.sh --fail-on-violations
+docker run --entrypoint="" -v $PWD:/data linter-rules-for-nextflow ./check.sh --fail-on-violations
 ```
 
 This is particularly useful in CI/CD pipelines where you want the build to fail if code quality issues are detected. You can also combine this with ruleset selection:
 
 ```shell
 cd examples
-docker run -v $PWD:/data linter-rules-for-nextflow ./check.sh --fail-on-violations general
+docker run --entrypoint="" -v $PWD:/data linter-rules-for-nextflow ./check.sh --fail-on-violations general
 ```
+
+Note: The `--entrypoint=""` flag is required to override the container's default entrypoint and run the script with custom arguments.
 
 #### AST Echo
 
 The container also contains the `ast-echo` application along with a script to run it (`echo-tree.sh`). For example:
 
 ```shell
-docker run -v $PWD/examples:/data linter-rules-for-nextflow ./echo-tree.sh /data/example.nf
+docker run --entrypoint="" -v $PWD/examples:/data linter-rules-for-nextflow ./echo-tree.sh /data/example.nf
 ```
+
+Note: The `--entrypoint=""` flag is required to override the container's default entrypoint and run the AST echo script directly.
 
 ### Helper scripts
 
