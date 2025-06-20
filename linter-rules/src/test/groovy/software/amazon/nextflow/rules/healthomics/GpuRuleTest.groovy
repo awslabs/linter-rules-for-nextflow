@@ -49,7 +49,7 @@ class GpuRuleTest extends AbstractRuleTestCase<GpuRule> {
         '''
         assertSingleViolation(
                 SOURCE, 3, 'accelerator 1, type: \'not-a-real-gpu\'',
-                'the GPU type specified: not-a-real-gpu is not a supported type [nvidia-tesla-t4, nvidia-tesla-a10g, nvidia-tesla-t4-a10g]')
+                'the GPU type specified: not-a-real-gpu is not a supported type [nvidia-tesla-t4, nvidia-tesla-t4-a10g, nvidia-tesla-a10g, nvidia-l4-a10g, nvidia-l4, nvidia-l40s]')
     }
 
     @Test
@@ -103,6 +103,73 @@ class GpuRuleTest extends AbstractRuleTestCase<GpuRule> {
         '''
 
         assertNoViolations(SOURCE)
+    }
+
+    @Test
+    void gpuRule_ParameterOrderIndependent(){
+        // Test that both parameter orders work (though Groovy parses them the same way)
+        final SOURCE1 = '''
+        process MY_PROCESS{
+            accelerator 2, type: 'nvidia-tesla-t4'
+        }
+        '''
+        
+        final SOURCE2 = '''
+        process MY_PROCESS{
+            accelerator type: 'nvidia-tesla-t4', 2
+        }
+        '''
+
+        assertNoViolations(SOURCE1)
+        assertNoViolations(SOURCE2)
+    }
+
+    @Test
+    void gpuRule_MissingCountParameter(){
+        final SOURCE = '''
+        process MY_PROCESS{
+            accelerator type: 'nvidia-tesla-t4'
+        }
+        '''
+        assertSingleViolation(SOURCE, 3, 'accelerator type: \'nvidia-tesla-t4\'', 
+                'the accelerator directive requires 2 arguments')
+    }
+
+    @Test
+    void gpuRule_MissingTypeParameter(){
+        final SOURCE = '''
+        process MY_PROCESS{
+            accelerator 2
+        }
+        '''
+        assertSingleViolation(SOURCE, 3, 'accelerator 2', 
+                'the accelerator directive requires 2 arguments')
+    }
+
+    @Test
+    void gpuRule_NewGpuTypesNoViolation(){
+        // Test all the new GPU types are accepted
+        final SOURCE_L4 = '''
+        process MY_PROCESS{
+            accelerator 1, type: 'nvidia-l4'
+        }
+        '''
+        
+        final SOURCE_L4_A10G = '''
+        process MY_PROCESS{
+            accelerator 1, type: 'nvidia-l4-a10g'
+        }
+        '''
+        
+        final SOURCE_L40S = '''
+        process MY_PROCESS{
+            accelerator 1, type: 'nvidia-l40s'
+        }
+        '''
+
+        assertNoViolations(SOURCE_L4)
+        assertNoViolations(SOURCE_L4_A10G)
+        assertNoViolations(SOURCE_L40S)
     }
 
 }

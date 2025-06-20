@@ -26,8 +26,11 @@ class GpuAstVisitor extends AbstractAstVisitor {
     def MAX_GPU=4
     def GPU_TYPES = [
             'nvidia-tesla-t4',
+            'nvidia-tesla-t4-a10g',
             'nvidia-tesla-a10g',
-            'nvidia-tesla-t4-a10g'
+            'nvidia-l4-a10g',
+            'nvidia-l4',
+            'nvidia-l40s'
     ]
 
     @Override
@@ -44,22 +47,40 @@ class GpuAstVisitor extends AbstractAstVisitor {
             addViolation(expression, 'the accelerator directive requires 2 arguments')
         }
         else{
-            def type = methodArguments.first()
-            def count = methodArguments.last()
-            switch (count){
-                case ConstantExpression:
-                    checkGpuCounts(count as ConstantExpression)
-                    break
-                case PropertyExpression:
-                    checkGpuCountsParam(count as PropertyExpression)
-                    break
-                default:
-                    addViolation(expression, 'Invalid count')
+            // Find parameters by type rather than position
+            def typeParam = null
+            def countParam = null
+            
+            methodArguments.each { arg ->
+                if (arg instanceof MapExpression) {
+                    typeParam = arg
+                } else if (arg instanceof ConstantExpression || arg instanceof PropertyExpression) {
+                    countParam = arg
+                }
             }
-
-            switch (type) {
-                case MapExpression:
-                    checkGpuType(type as MapExpression)
+            
+            // Validate that we found both required parameters
+            if (countParam == null) {
+                addViolation(expression, 'the accelerator directive requires a count parameter')
+            } else {
+                // Validate count parameter
+                switch (countParam) {
+                    case ConstantExpression:
+                        checkGpuCounts(countParam as ConstantExpression)
+                        break
+                    case PropertyExpression:
+                        checkGpuCountsParam(countParam as PropertyExpression)
+                        break
+                    default:
+                        addViolation(expression, 'Invalid count parameter type')
+                }
+            }
+            
+            if (typeParam == null) {
+                addViolation(expression, 'the accelerator directive requires a type parameter')
+            } else {
+                // Validate type parameter
+                checkGpuType(typeParam as MapExpression)
             }
         }
     }

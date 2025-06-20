@@ -20,7 +20,7 @@ import picocli.CommandLine;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "AstEchoCli", mixinStandardHelpOptions = true, version = "AstEchoCli 0.1",
+@Command(name = "AstEchoCli", mixinStandardHelpOptions = true, version = "AstEchoCli 0.1.1",
         description = "Echoes the AST of a Groovy script or DSL to STDOUT.")
 public class AstEchoCli implements Callable<Integer> {
 
