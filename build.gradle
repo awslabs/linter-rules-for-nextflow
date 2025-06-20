@@ -5,7 +5,7 @@ plugins {
 // Global version management
 allprojects {
     group = 'software.amazon'
-    version = '0.1.1'
+    version = '0.1.2'
 }
 
 // Release automation tasks
@@ -60,19 +60,19 @@ task updateVersion {
         // Update root build.gradle
         def rootBuildFile = file('build.gradle')
         def rootContent = rootBuildFile.text
-        rootContent = rootContent.replaceAll(/version = '[^']*'/, "version = '${newVersion}'")
+        rootContent = rootContent.replaceAll(/version = '0.1.2']*'/, "version = '0.1.2'")
         rootBuildFile.text = rootContent
         
         // Update linter-rules build.gradle
         def linterBuildFile = file('linter-rules/build.gradle')
         def linterContent = linterBuildFile.text
-        linterContent = linterContent.replaceAll(/version = '[^']*'/, "version = '${newVersion}'")
+        linterContent = linterContent.replaceAll(/version = '0.1.2']*'/, "version = '0.1.2'")
         linterBuildFile.text = linterContent
         
         // Update ast-echo build.gradle
         def astBuildFile = file('ast-echo/build.gradle')
         def astContent = astBuildFile.text
-        astContent = astContent.replaceAll(/version = '[^']*'/, "version = '${newVersion}'")
+        astContent = astContent.replaceAll(/version = '0.1.2']*'/, "version = '0.1.2'")
         astBuildFile.text = astContent
         
         // Update AstEchoCli.java

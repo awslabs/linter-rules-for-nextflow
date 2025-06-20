@@ -53,7 +53,7 @@ Assuming your have built this library (see "Build" above) you can run the follow
 
 ```shell
 java  -Dorg.slf4j.simpleLogger.defaultLogLevel=error \
-  -classpath ./linter-rules/build/libs/linter-rules-0.1.1.jar:CodeNarc-3.3.0-all.jar:slf4j-api-1.7.36.jar:slf4j-simple-1.7.36.jar \
+  -classpath ./linter-rules/build/libs/linter-rules-0.1.2.jar:CodeNarc-3.3.0-all.jar:slf4j-api-1.7.36.jar:slf4j-simple-1.7.36.jar \
   org.codenarc.CodeNarc \
   -report=text:stdout \
   -rulesetfiles=rulesets/healthomics.xml \
@@ -73,7 +73,7 @@ run:
 
 ```shell
 java  -Dorg.slf4j.simpleLogger.defaultLogLevel=error \
-  -classpath ./linter-rules/build/libs/linter-rules-0.1.1.jar:CodeNarc-3.3.0-all.jar:slf4j-api-1.7.36.jar:slf4j-simple-1.7.36.jar \
+  -classpath ./linter-rules/build/libs/linter-rules-0.1.2.jar:CodeNarc-3.3.0-all.jar:slf4j-api-1.7.36.jar:slf4j-simple-1.7.36.jar \
   org.codenarc.CodeNarc \
   -report=text:stdout \
   -rulesetfiles=rulesets/general.xml \
