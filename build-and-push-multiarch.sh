@@ -10,7 +10,7 @@ set -e
 REGISTRY="public.ecr.aws/aws-genomics"
 IMAGE_NAME="linter-rules-for-nextflow"
 VERSION="v0.1.2"
-PLATFORMS=("linux/amd64" "linux/arm64")
+PLATFORMS="linux/amd64,linux/arm64"
 
 # Colors for output
 RED='\033[0;31m'
@@ -83,10 +83,10 @@ build_with_docker() {
 
     for TAG in "${TAGS[@]}"; do
         print_status "Building and pushing: $TAG"
-        print_status "Platforms: linux/amd64,linux/arm64"
+        print_status "Platforms: $PLATFORMS"
         
         docker buildx build \
-            --platform linux/amd64,linux/arm64 \
+            --platform "$PLATFORMS" \
             --tag "$TAG" \
             --push \
             .
@@ -100,9 +100,9 @@ build_with_docker() {
     done
 }
 
-# Function to build with Finch (separate builds per platform)
+# Function to build with Finch (native multi-platform support)
 build_with_finch() {
-    print_warning "Finch requires separate builds for each platform"
+    print_status "Using Finch native multi-platform build support"
     
     # Tags to build
     TAGS=(
@@ -110,60 +110,35 @@ build_with_finch() {
         "${REGISTRY}/${IMAGE_NAME}:${VERSION}"
     )
     
-    # Build for each platform and tag combination
-    for PLATFORM in "${PLATFORMS[@]}"; do
-        ARCH=$(echo $PLATFORM | cut -d'/' -f2)
-        print_status "Building for platform: $PLATFORM"
-        
-        for TAG in "${TAGS[@]}"; do
-            PLATFORM_TAG="${TAG}-${ARCH}"
-            print_status "Building: $PLATFORM_TAG"
-            
-            finch builder build \
-                --platform "$PLATFORM" \
-                --tag "$PLATFORM_TAG" \
-                .
-            
-            if [ $? -ne 0 ]; then
-                print_error "Failed to build: $PLATFORM_TAG"
-                exit 1
-            fi
-            
-            print_status "Pushing: $PLATFORM_TAG"
-            finch push "$PLATFORM_TAG"
-            
-            if [ $? -ne 0 ]; then
-                print_error "Failed to push: $PLATFORM_TAG"
-                exit 1
-            fi
-        done
-    done
-    
-    # Create and push multi-arch manifests
-    print_status "Creating multi-architecture manifests..."
-    
+    # Build and push for each tag
     for TAG in "${TAGS[@]}"; do
-        print_status "Creating manifest for: $TAG"
+        print_status "Building multi-platform image: $TAG"
+        print_status "Platforms: $PLATFORMS"
         
-        # Create manifest list
-        MANIFEST_ARGS=()
-        for PLATFORM in "${PLATFORMS[@]}"; do
-            ARCH=$(echo $PLATFORM | cut -d'/' -f2)
-            MANIFEST_ARGS+=("${TAG}-${ARCH}")
-        done
+        # Build multi-platform image
+        finch build \
+            --platform "$PLATFORMS" \
+            --tag "$TAG" \
+            .
         
-        # Note: Finch doesn't have native manifest support, so we'll use Docker for this part
-        if command -v docker > /dev/null 2>&1; then
-            print_status "Using Docker to create manifest (Finch limitation)"
-            docker manifest create "$TAG" "${MANIFEST_ARGS[@]}"
-            docker manifest push "$TAG"
-        else
-            print_warning "Cannot create multi-arch manifest without Docker. Individual platform images pushed:"
-            for PLATFORM in "${PLATFORMS[@]}"; do
-                ARCH=$(echo $PLATFORM | cut -d'/' -f2)
-                echo "  - ${TAG}-${ARCH}"
-            done
+        if [ $? -ne 0 ]; then
+            print_error "Failed to build: $TAG"
+            exit 1
         fi
+        
+        print_status "Pushing multi-platform image: $TAG"
+        
+        # Push multi-platform image
+        finch push \
+            --platform "$PLATFORMS" \
+            "$TAG"
+        
+        if [ $? -ne 0 ]; then
+            print_error "Failed to push: $TAG"
+            exit 1
+        fi
+        
+        print_status "Successfully built and pushed: $TAG"
     done
 }
 
@@ -181,7 +156,7 @@ TAGS=(
     "${REGISTRY}/${IMAGE_NAME}:${VERSION}"
 )
 for TAG in "${TAGS[@]}"; do
-    echo "  - $TAG"
+    echo "  - $TAG (multi-arch: linux/amd64, linux/arm64)"
 done
 
 if [ "$CONTAINER_RUNTIME" = "docker" ]; then
@@ -189,5 +164,7 @@ if [ "$CONTAINER_RUNTIME" = "docker" ]; then
     echo "  docker buildx imagetools inspect ${REGISTRY}/${IMAGE_NAME}:latest"
     echo "  docker buildx imagetools inspect ${REGISTRY}/${IMAGE_NAME}:${VERSION}"
 else
-    print_status "Individual platform images were pushed. If Docker is available, multi-arch manifests were created."
+    print_status "You can verify the images with:"
+    echo "  finch manifest inspect ${REGISTRY}/${IMAGE_NAME}:latest"
+    echo "  finch manifest inspect ${REGISTRY}/${IMAGE_NAME}:${VERSION}"
 fi
