@@ -8,12 +8,20 @@ allprojects {
     version = '0.1.2'
 }
 
+// Project.exec() was removed in Gradle 9, so tasks run commands through an injected ExecOperations
+interface InjectedExecOps {
+    @javax.inject.Inject
+    ExecOperations getExecOps()
+}
+
+def execOps = project.objects.newInstance(InjectedExecOps).execOps
+
 // Release automation tasks
 task checkGitStatus {
     description = 'Checks if git working directory is clean'
     doLast {
         def statusOutput = new ByteArrayOutputStream()
-        exec {
+        execOps.exec {
             commandLine 'git', 'status', '--porcelain'
             standardOutput = statusOutput
             ignoreExitValue = true
@@ -31,7 +39,7 @@ task getCurrentBranch {
     description = 'Gets the current git branch'
     doLast {
         def branchOutput = new ByteArrayOutputStream()
-        exec {
+        execOps.exec {
             commandLine 'git', 'rev-parse', '--abbrev-ref', 'HEAD'
             standardOutput = branchOutput
         }
@@ -118,13 +126,13 @@ task createGitTag {
         def tagName = "v${newVersion}"
         
         // Create tag
-        exec {
+        execOps.exec {
             commandLine 'git', 'tag', tagName
         }
         println "✓ Created tag: ${tagName}"
         
         // Push tag
-        exec {
+        execOps.exec {
             commandLine 'git', 'push', 'origin', tagName
         }
         println "✓ Pushed tag: ${tagName}"
@@ -140,19 +148,19 @@ task commitVersionUpdate {
         }
         
         // Add all modified files
-        exec {
+        execOps.exec {
             commandLine 'git', 'add', 'build.gradle', 'linter-rules/build.gradle', 'ast-echo/build.gradle', 
                        'ast-echo/src/main/java/software/amazon/groovy/AstEchoCli.java', 'README.md'
         }
         
         // Commit changes
-        exec {
+        execOps.exec {
             commandLine 'git', 'commit', '-m', "chore: bump version to ${newVersion}"
         }
         println "✓ Committed version update"
         
         // Push changes
-        exec {
+        execOps.exec {
             commandLine 'git', 'push', 'origin', 'main'
         }
         println "✓ Pushed version update"
@@ -169,7 +177,7 @@ task generateReleaseNotes {
         
         // Get the previous tag
         def tagOutput = new ByteArrayOutputStream()
-        exec {
+        execOps.exec {
             commandLine 'git', 'describe', '--tags', '--abbrev=0', 'HEAD^'
             standardOutput = tagOutput
             ignoreExitValue = true
@@ -182,7 +190,7 @@ task generateReleaseNotes {
         
         // Get commits since previous tag
         def logOutput = new ByteArrayOutputStream()
-        exec {
+        execOps.exec {
             commandLine 'git', 'log', "${previousTag}..HEAD", '--pretty=format:- %s (%h)', '--no-merges'
             standardOutput = logOutput
         }
@@ -248,7 +256,7 @@ task generateChecksums {
             def artifact = file(artifactPath)
             if (artifact.exists()) {
                 def checksumOutput = new ByteArrayOutputStream()
-                exec {
+                execOps.exec {
                     commandLine 'sha256sum', artifact.absolutePath
                     standardOutput = checksumOutput
                 }
@@ -336,7 +344,7 @@ task preRelease {
         
         // Check git status
         def statusOutput = new ByteArrayOutputStream()
-        exec {
+        execOps.exec {
             commandLine 'git', 'status', '--porcelain'
             standardOutput = statusOutput
             ignoreExitValue = true
@@ -352,7 +360,7 @@ task preRelease {
         
         // Check current branch
         def branchOutput = new ByteArrayOutputStream()
-        exec {
+        execOps.exec {
             commandLine 'git', 'rev-parse', '--abbrev-ref', 'HEAD'
             standardOutput = branchOutput
         }
@@ -366,7 +374,7 @@ task preRelease {
         
         // Check if tag already exists
         def tagOutput = new ByteArrayOutputStream()
-        exec {
+        execOps.exec {
             commandLine 'git', 'tag', '-l', "v${newVersion}"
             standardOutput = tagOutput
             ignoreExitValue = true
@@ -418,7 +426,7 @@ task listReleases {
     group = 'help'
     doLast {
         def tagOutput = new ByteArrayOutputStream()
-        exec {
+        execOps.exec {
             commandLine 'git', 'tag', '-l', '--sort=-version:refname'
             standardOutput = tagOutput
         }
