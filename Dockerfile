@@ -1,6 +1,6 @@
 FROM public.ecr.aws/amazonlinux/amazonlinux:2023
 
-RUN dnf install java-17 wget /usr/bin/xargs -y
+RUN dnf install java-17-amazon-corretto-devel wget /usr/bin/xargs -y
 
 WORKDIR /work
 COPY . ./src
