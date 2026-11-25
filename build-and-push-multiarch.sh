@@ -81,23 +81,23 @@ build_with_docker() {
         "${REGISTRY}/${IMAGE_NAME}:${VERSION}"
     )
 
-    for TAG in "${TAGS[@]}"; do
-        print_status "Building and pushing: $TAG"
-        print_status "Platforms: $PLATFORMS"
-        
-        docker buildx build \
-            --platform "$PLATFORMS" \
-            --tag "$TAG" \
-            --push \
-            .
-        
-        if [ $? -eq 0 ]; then
-            print_status "Successfully built and pushed: $TAG"
-        else
-            print_error "Failed to build and push: $TAG"
-            exit 1
-        fi
-    done
+    # Single build (both tags share one digest); --pull/--no-cache ensure the
+    # latest base image and OS packages (e.g. patched JDK) are picked up.
+    TAG_ARGS=()
+    for TAG in "${TAGS[@]}"; do TAG_ARGS+=(--tag "$TAG"); done
+
+    print_status "Building and pushing: ${TAGS[*]}"
+    print_status "Platforms: $PLATFORMS"
+
+    docker buildx build \
+        --pull \
+        --no-cache \
+        --platform "$PLATFORMS" \
+        "${TAG_ARGS[@]}" \
+        --push \
+        .
+
+    print_status "Successfully built and pushed: ${TAGS[*]}"
 }
 
 # Function to build with Finch (native multi-platform support)
@@ -110,22 +110,23 @@ build_with_finch() {
         "${REGISTRY}/${IMAGE_NAME}:${VERSION}"
     )
     
-    # Build and push for each tag
+    # Single build (both tags share one digest); --pull/--no-cache ensure the
+    # latest base image and OS packages (e.g. patched JDK) are picked up.
+    TAG_ARGS=()
+    for TAG in "${TAGS[@]}"; do TAG_ARGS+=(--tag "$TAG"); done
+
+    print_status "Building multi-platform image: ${TAGS[*]}"
+    print_status "Platforms: $PLATFORMS"
+
+    finch build \
+        --pull \
+        --no-cache \
+        --platform "$PLATFORMS" \
+        "${TAG_ARGS[@]}" \
+        .
+
+    # Push each tag
     for TAG in "${TAGS[@]}"; do
-        print_status "Building multi-platform image: $TAG"
-        print_status "Platforms: $PLATFORMS"
-        
-        # Build multi-platform image
-        finch build \
-            --platform "$PLATFORMS" \
-            --tag "$TAG" \
-            .
-        
-        if [ $? -ne 0 ]; then
-            print_error "Failed to build: $TAG"
-            exit 1
-        fi
-        
         print_status "Pushing multi-platform image: $TAG"
         
         # Push multi-platform image
